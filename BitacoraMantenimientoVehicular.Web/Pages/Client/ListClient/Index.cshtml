@@ -1,0 +1,162 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Datasource.Entities
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Client.ListClient.IndexModel
+@(Html.DevExtreme().DataGrid<ClientEntity>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("Client")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("Id")
+    )
+      .ID("gridContainer")
+    .AllowColumnReordering(true)
+    .AllowColumnResizing(true)
+    .ColumnAutoWidth(true)
+    .Export(e => e.Enabled(true))
+
+    .Editing(c => c
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .AllowAdding(true)
+        .Mode(GridEditMode.Popup)
+        .RefreshMode(GridEditRefreshMode.Reshape)
+        .Popup(e => e
+            .Title("Vehicle Info")
+            .ShowTitle(true)
+            .Width(700)
+            .Height(545)
+        )
+        .Form(f => f.Items(items =>
+        {
+            items.AddGroup()
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems =>
+                {
+                    groupItems.AddSimpleFor(m => m.Name);
+                    groupItems.AddSimpleFor(m => m.Address);
+                    groupItems.AddSimpleFor(m => m.Dni);
+                    groupItems.AddSimpleFor(m => m.Mail);
+                    groupItems.AddSimpleFor(m => m.Phone);
+                    groupItems.AddSimpleFor(m => m.CellPhone);
+                    groupItems.AddSimpleFor(m => m.IsEnable);
+                });
+
+            items.AddGroup()
+                .Caption("Client Details")
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems =>
+                {
+                    groupItems.AddSimpleFor(m => m.Telegram);
+                    groupItems.AddSimpleFor(m => m.TelegramCode);
+
+                });
+        }))
+    )
+    .Grouping(grouping => grouping.AutoExpandAll(true))
+    .GroupPanel(groupPanel => groupPanel.Visible(true))
+    .Height(500)
+    .HeaderFilter(h => h.Visible(true))
+    .FocusedRowEnabled(true)
+    .FocusedRowIndex(0)
+    .FilterPanel(f => f.Visible(true))
+    .FilterRow(filterRow => filterRow
+        .Visible(true)
+        .ApplyFilter(GridApplyFilterMode.Auto)
+    )
+    .RepaintChangesOnly(true)
+    .RowAlternationEnabled(true)
+    .RepaintChangesOnly(true)
+    .RemoteOperations(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Infinite))
+    .ShowBorders(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .ShowBorders(true)
+    .ShowRowLines(true)
+    .LoadPanel(loadPanel => loadPanel.Enabled(true))
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .OnExporting("exporting")
+    .Columns(columns => {
+
+        columns.AddFor(m => m.Id).Visible(false).AllowEditing(false);
+        columns.AddFor(m => m.Name).AllowSearch(true).Width(280).Fixed(true).Caption("Client")
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Name is required");
+            });
+        columns.AddFor(m => m.Address).EditorOptions(new { showClearButton = true });
+        columns.AddFor(m => m.Dni)
+            .EditorOptions(new
+            {
+                showClearButton = true
+            })
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Ruc is required");
+                vr.AddNumeric();
+                vr.AddStringLength().Min(10).Max(13);
+
+            });
+        columns.AddFor(m => m.Mail).EditorOptions(new { showClearButton = true })
+            .AllowSearch(true)
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Email address is required");
+                vr.AddEmail().Message("Email address is required");
+            });
+        columns.AddFor(m => m.Phone).Caption("Phone Number")
+            .AllowSearch(true)
+            .EditorOptions(new
+            {
+                mask = "(00) 000-0000",
+                showClearButton = true
+            })
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Phone Number is required");
+            });
+        columns.AddFor(m => m.CellPhone).Caption("Cell Number")
+            .AllowSearch(true)
+            .EditorOptions(new
+            {
+                mask = "(00) 0000-0000",
+                showClearButton = true
+            })
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Cell Phone Number is required");
+            });
+        columns.AddFor(m => m.Telegram).AllowSearch(true).EditorOptions(new { showClearButton = true });
+        columns.AddFor(m => m.TelegramCode).EditorOptions(new {mask="0000", showClearButton = true });
+        columns.AddFor(m => m.IsEnable).EditorOptions(new { showClearButton = true }).AllowSearch(true);
+        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+    })
+
+    )
+
+<script>
+    function exporting(e) {
+        var workbook = new window.ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Clients');
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: e.component,
+            worksheet: worksheet,
+            autoFilterEnabled: true
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ListClient.xlsx');
+            });
+        });
+        e.cancel = true;
+    }
+</script>

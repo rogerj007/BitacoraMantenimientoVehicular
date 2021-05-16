@@ -1,0 +1,404 @@
+@using DevExtreme.AspNet.Mvc
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Vehicle Maintenance Web</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    @* Uncomment to use the HtmlEditor control *@
+    @* <script src="https://unpkg.com/devextreme-quill/dist/dx-quill.min.js"></script> *@
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/3.3.1/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.4.0/polyfill.min.js"></script>
+    <script src="https://cdn3.devexpress.com/jslib/20.2.5/js/localization/dx.messages.es.js"></script>
+
+    <link rel="stylesheet" href="~/css/vendor.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Site.css" />
+    <script src="~/js/vendor.js" asp-append-version="true"></script>
+    <style>
+        .rightMenu {
+            float: right;
+        }
+
+        .options {
+            padding: 20px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            top: 0;
+            background-color: rgba(191, 191, 191, 0.15);
+        }
+    </style>
+</head>
+
+<body class="dx-viewport">
+    <div id="app-side-nav-outer-toolbar">
+        <div class="layout-header">
+
+            <div class="rightMenu" style="position:relative;z-index:100">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @(Html.DevExtreme().Menu()
+                        .ID("menuRight")
+                        .DataSource(new JS("menuData"))
+                        .DisplayExpr("name")
+                        .HideSubmenuOnMouseLeave(false)
+                        .OnItemClick("menuItem_click")
+                        )
+                }
+            </div>
+
+            @(Html.DevExtreme().Toolbar()
+                .Items(items =>
+                {
+                    items.Add()
+                        .Widget(w => w
+                            .Button()
+                            .Icon("menu")
+                            .OnClick("MantenimientoVehicular_Web.onMenuButtonClick")
+                        )
+                        .Location(ToolbarItemLocation.Before)
+                        .CssClass("menu-button");
+                    items.Add()
+                        .Html("<div>Vehicle Maintenance Web</div>")
+                        .Location(ToolbarItemLocation.Before)
+                        .CssClass("header-title");
+                })
+                )
+        </div>
+        <div class="layout-body layout-body-hidden">
+            @(Html.DevExtreme().Drawer()
+                .ID("layout-drawer")
+                .Position(DrawerPosition.Left)
+                .Opened(new JS("MantenimientoVehicular_Web.restoreDrawerOpened()"))
+                .Content(@<text>
+                    <div id="layout-drawer-scrollview" class="with-footer">
+                        <div class="content">
+                            @RenderBody()
+                        </div>
+                        <div class="content-block">
+                            <div class="content-footer">
+                                <div id="footer">
+                                    Copyright (c) @DateTime.Now.Year Developer RJ Inc.
+                                    <br />
+                                    El mantenimiento vehicular preventivo es fundamental para que nuestro carro siempre esté funcionando correctamente. Este se puede clasificar de acuerdo al lugar donde se presentan daños: mantenimiento eléctrico, de instrumentación o mecánico.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </text>)
+                .Template(new TemplateName("navigation-menu"))
+            )
+        </div>
+    </div>
+
+    @using (Html.DevExtreme().NamedTemplate("navigation-menu"))
+    {
+        <div class="menu-container dx-swatch-additional">
+
+            @functions{
+                string GetUrl(string pageName) => Url.Page("/" + pageName);
+                string GetCurrentUrl() => Url.Page(ViewContext.RouteData.Values["page"]?.ToString());
+                bool IsCurrentUrl(string pageName) => GetUrl(pageName) == GetCurrentUrl();
+            }
+
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @(Html.DevExtreme().TreeView()
+                .SearchEnabled(true)
+                .Items(items => {
+
+                    items.Add()
+                        .Text("Home")
+                        .Icon("home")
+                        .Option("path", GetUrl("Index"))
+                        .Selected(IsCurrentUrl("Index"));
+                    items.Add()
+                        .Text("Client")
+                        .Icon("runner")
+                        .Expanded(false)
+                        .HasItems(true)
+                        .ParentId("UserMenu")
+                        .Items(subItems =>
+                        {
+                            subItems.Add()
+                                .Text("List Clients")
+                                .Icon("coffee")
+                                .Option("path", GetUrl("Client/ListClient/Index"))
+                                .Selected(IsCurrentUrl("Client/ListClient/Index"));
+                        });
+                    items.Add()
+                        .Text("Setup")
+                        .Icon("toolbox")
+                        .Expanded(false)
+                        .HasItems(true)
+                        .ParentId("SetupMenu")
+                        .Items(subItems =>
+                        {
+                            subItems.Add()
+                                .Text("Color")
+                                .Icon("palette")
+                                .Option("path", GetUrl("EnvironmentVariables/Color/Index"))
+                                .Selected(IsCurrentUrl("EnvironmentVariables/Color/Index"));
+                            subItems.Add()
+                                .Text("Country")
+                                .Icon("globe")
+                                .Option("path", GetUrl("EnvironmentVariables/Country/Index"))
+                                .Selected(IsCurrentUrl("EnvironmentVariables/Country/Index"));
+                            subItems.Add()
+                                .Text("Fuel")
+                                .Icon("fill")
+                                .Option("path", GetUrl("EnvironmentVariables/Fuel/Index"))
+                                .Selected(IsCurrentUrl("EnvironmentVariables/Fuel/Index"));
+                        });
+
+                    items.Add()
+                        .Text("Vehicle")
+                        .Icon("product")
+                        .Expanded(false)
+                        .HasItems(true)
+                        .ParentId("VehileMenu")
+                        .Items(subItems =>
+                        {
+                            subItems.Add()
+                                .Text("Component")
+                                .Icon("columnproperties")
+                                .Option("path", GetUrl("Vehicle/Component/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/Component/Index"));
+                            subItems.Add()
+                                .Text("Vehicle Brand")
+                                .Icon("columnchooser")
+                                .Option("path", GetUrl("Vehicle/VehicleBrand/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/VehicleBrand/Index"));
+                            subItems.Add()
+                                .Text("Maintenance Task")
+                                .Icon("fieldchooser")
+                                .Option("path", GetUrl("Vehicle/MaintenanceTask/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/MaintenanceTask/Index"));
+                            subItems.Add()
+                                .Text("Status Vehicle")
+                                .Icon("more")
+                                .Option("path", GetUrl("Vehicle/Status/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/Status/Index"));
+                            subItems.Add()
+                                .Text("Vehicle")
+                                .Icon("car")
+                                .Option("path", GetUrl("Vehicle/ListVehicle/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/ListVehicle/Index"));
+                        });
+
+
+                    items.Add()
+                        .Text("Users")
+                        .Icon("group")
+                        .Expanded(false)
+                        .HasItems(true)
+                        .ParentId("UserMenu")
+                        .Items(subItems =>
+                        {
+                            subItems.Add()
+                                .Text("List Users")
+                                .Icon("user")
+                                .Option("path", GetUrl("Account/User/Index"))
+                                .Selected(IsCurrentUrl("Account/User/Index"));
+                        });
+
+
+                    items.Add()
+                        .Text("About")
+                        .Icon("info")
+                        .Option("path", GetUrl("About"))
+                        .Selected(IsCurrentUrl("About"));
+                })
+                .SearchEnabled(true)
+                .ExpandEvent(TreeViewExpandEvent.Click)
+                .SelectionMode(NavSelectionMode.Single)
+                .SelectedExpr("selected")
+                .FocusStateEnabled(false)
+                .Width(250)
+                .OnItemClick("MantenimientoVehicular_Web.onTreeViewItemClick")
+            )
+
+            }
+            else
+            {
+                @(Html.DevExtreme().TreeView()
+                .SearchEnabled(true)
+                .Items(items =>
+                {
+                    items.Add()
+                        .Text("Home")
+                        .Icon("home")
+                        .Option("path", GetUrl("Index"))
+                        .Selected(IsCurrentUrl("Index"));
+
+                    items.Add()
+                        .Text("About")
+                        .Icon("info")
+                        .Option("path", GetUrl("About"))
+                        .Selected(IsCurrentUrl("About"));
+                    items.Add()
+                        .Text("Login")
+                        .Icon("user")
+                        .Option("path", GetUrl("Account/User/Login"))
+                        .Selected(IsCurrentUrl("Account/User/Login"));
+                })
+                .SearchEnabled(true)
+                .ExpandEvent(TreeViewExpandEvent.Click)
+                .SelectionMode(NavSelectionMode.Single)
+                .SelectedExpr("selected")
+                .FocusStateEnabled(false)
+                .Width(250)
+                .OnItemClick("MantenimientoVehicular_Web.onTreeViewItemClick")
+            )
+            }
+
+
+
+        </div>
+    }
+
+    <script>
+
+        var MantenimientoVehicular_Web = (function () {
+
+            var drawerOpenedKey = "MantenimientoVehicular_Web-drawer-opened";
+
+            var breakpoints = {
+                xSmallMedia: window.matchMedia("(max-width: 599.99px)"),
+                smallMedia: window.matchMedia("(min-width: 600px) and (max-width: 959.99px)"),
+                mediumMedia: window.matchMedia("(min-width: 960px) and (max-width: 1279.99px)"),
+                largeMedia: window.matchMedia("(min-width: 1280px)")
+            };
+
+            function getDrawer() {
+                return $("#layout-drawer").dxDrawer("instance");
+            }
+
+            function restoreDrawerOpened() {
+                var isLarge = breakpoints.largeMedia.matches;
+                if (!isLarge)
+                    return false;
+
+                var state = sessionStorage.getItem(drawerOpenedKey);
+                if (state === null)
+                    return isLarge;
+
+                return state === "true";
+            }
+
+            function saveDrawerOpened() {
+                sessionStorage.setItem(drawerOpenedKey, getDrawer().option("opened"));
+            }
+
+            function updateDrawer() {
+                var isXSmall = breakpoints.xSmallMedia.matches,
+                    isLarge = breakpoints.largeMedia.matches;
+
+                getDrawer().option({
+                    openedStateMode: isLarge ? "shrink" : "overlap",
+                    revealMode: isXSmall ? "slide" : "expand",
+                    minSize: isXSmall ? 0 : 60,
+                    shading: !isLarge,
+                });
+            }
+
+            function init() {
+                $("#layout-drawer-scrollview").dxScrollView({ direction: "vertical" });
+
+                $.each(breakpoints, function (_, size) {
+                    size.addListener(function (e) {
+                        if (e.matches)
+                            updateDrawer();
+                    });
+                });
+
+                updateDrawer();
+
+                $('.layout-body').removeClass('layout-body-hidden');
+            }
+
+            function navigate(url, delay) {
+                if (url)
+                    setTimeout(function () { location.href = url }, delay);
+            }
+
+            function onMenuButtonClick() {
+                getDrawer().toggle();
+                saveDrawerOpened();
+            }
+
+            function onTreeViewItemClick(e) {
+                var drawer = getDrawer();
+                var savedOpened = restoreDrawerOpened();
+                var actualOpened = drawer.option("opened");
+
+                if (!actualOpened) {
+                    drawer.show();
+                } else {
+                    var willHide = !savedOpened || !breakpoints.largeMedia.matches;
+                    var willNavigate = !e.itemData.selected;
+
+                    if (willHide)
+                        drawer.hide();
+
+                    if (willNavigate)
+                        navigate(e.itemData.path, willHide ? 400 : 0);
+                }
+            }
+
+            return {
+                init: init,
+                restoreDrawerOpened: restoreDrawerOpened,
+                onMenuButtonClick: onMenuButtonClick,
+                onTreeViewItemClick: onTreeViewItemClick
+            };
+        })();
+
+        document.addEventListener("DOMContentLoaded", function documentReady() {
+            this.removeEventListener("DOMContentLoaded", documentReady);
+            MantenimientoVehicular_Web.init();
+        });
+
+
+        var menuData = [{
+            id: "1",
+            name: "User",
+            items: [
+                {
+                    id: "1_1",
+                    name: "Change Password",
+                    key: "changepassword"
+                },
+                {
+                id: "1_2",
+                name: "Log Out",
+                key: "logout"
+              }
+            ]
+        }];
+
+        function menuItem_click(e) {
+            var item = e.itemData;
+            if (item.key === "changepassword") {
+                window.location = '/Account/User/ChangePassword';
+            }
+            if (item.key ==="logout"){
+                window.location = '@Url.Action("Logout", "Account")';
+            }
+        }
+
+    </script>
+</body>
+
+</html>

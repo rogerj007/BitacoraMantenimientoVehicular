@@ -1,0 +1,96 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Datasource.Entities
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Vehicle.MaintenanceTask.IndexModel
+@(Html.DevExtreme().DataGrid<MaintenanceTaskEntity>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("MaintenanceTask")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("Id")
+    )
+   .ID("gridContainer")
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .Editing(e => e.Mode(GridEditMode.Popup)
+            .AllowAdding(true)
+            .AllowUpdating(true)
+            .AllowDeleting(true)
+            .RefreshMode(GridEditRefreshMode.Reshape)
+            .Popup(p => p
+                .Title("Component Info")
+                .ShowTitle(true)
+                .Width(700)
+                .Height(225)
+                .Position(pos => pos
+                    .My(HorizontalAlignment.Center, VerticalAlignment.Top)
+                    .At(HorizontalAlignment.Center, VerticalAlignment.Top)
+                    .Of(new JS("window"))
+                )
+            )
+            .Form(f => f.Items(items =>
+            {
+                items.AddGroup()
+                    .ColCount(2)
+                    .ColSpan(2)
+                    .Items(groupItems =>
+                    {
+                        groupItems.AddSimpleFor(m => m.Name)
+                            .ColSpan(2)
+                            .Editor(editor => editor.TextArea().Height(100));
+                    });
+            }))
+    )
+    .RowAlternationEnabled(true)
+    .ShowRowLines(true)
+    .Height(500)
+    .FocusedRowEnabled(true)
+    .FocusedRowIndex(0)
+    .ColumnAutoWidth(true)
+    .ShowBorders(true)
+    .FilterPanel(f => f.Visible(true))
+    .HeaderFilter(h => h.Visible(true))
+    .Scrolling(s => s.Mode(GridScrollingMode.Infinite))
+    .ShowBorders(true)
+    .RepaintChangesOnly(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .AllowColumnReordering(true)
+    .AllowColumnResizing(true)
+    .RemoteOperations(true)
+    .Export(e => e.Enabled(true))
+    .OnExporting("exporting")
+    .Columns(columns => {
+
+        columns.AddFor(m => m.Id).AllowSearch(true).AllowEditing(false);
+        columns.AddFor(m => m.Name).AllowSearch(true);
+        columns.AddFor(m => m.Km).AllowSearch(true)
+                .DataType(GridColumnDataType.Number);
+
+        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.IsEnable);
+    })
+)
+
+<script>
+    function exporting(e) {
+        var workbook = new ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet('VehicleTaks');
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: e.component,
+            worksheet: worksheet,
+            autoFilterEnabled: true
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'VehicleTaks.xlsx');
+            });
+        });
+        e.cancel = true;
+    }
+</script>

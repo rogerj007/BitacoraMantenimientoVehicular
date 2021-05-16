@@ -1,0 +1,74 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Web.Models
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Account.User.LoginModel
+<div id="form-container">
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        @using (Html.DevExtreme().ValidationGroup())
+        {
+            @Html.AntiForgeryToken()
+            @(Html.DevExtreme().Form<LoginViewModel>()
+            .ID("form")
+            .ShowValidationSummary(true)
+            .Items(items =>
+            {
+                items.AddGroup().Caption("Login").Items(groupItems =>
+                {
+                    groupItems.AddSimpleFor(m => m.Username)
+                        .Editor(y => y.TextBox().Mode(TextBoxMode.Email).Placeholder("Enter User Name").ShowClearButton(true))
+                        .ValidationRules(r => r
+                            .AddRequired()
+                            .Message("The user name is required")
+                        );
+                    groupItems.AddSimpleFor(m => m.Password)
+                        .Editor(y => y.TextBox().Mode(TextBoxMode.Password).Placeholder("Enter Password").ShowClearButton(true))
+                        .ValidationRules(r => r
+                            .AddRequired()
+                            .Message("The password is required")
+
+                        );
+                    groupItems.AddSimpleFor(m => m.RememberMe).Editor(r => r.Switch());
+
+
+                });
+                items.AddButton()
+                    .HorizontalAlignment(HorizontalAlignment.Left)
+                    .ButtonOptions(b => b.Text("Login")
+                        .Icon("check")
+                        .Type(ButtonType.Success)
+                        .StylingMode(ButtonStylingMode.Contained)
+                        .Width(120)
+                        .UseSubmitBehavior(true));
+            }
+            ))
+        }
+    }
+
+
+</div>
+<script>
+    function getFormInstance() {
+        return $("#form").dxForm("instance");
+    }
+
+    function screenByWidth(width) {
+        return width < 720 ? "sm" : "md";
+    }
+
+    function ckeckBox_valueChanged(e) {
+        var form = getFormInstance();
+        if (e.value) {
+            form.option("colCountByScreen.sm", 2);
+            form.option("colCountByScreen.md", 3);
+        } else {
+            form.option("colCountByScreen.sm", undefined);
+            form.option("colCountByScreen.md", undefined);
+        }
+    }
+
+    function form_customizeItem(item) {
+        if (item.dataField == "Notes")
+            item.visible = false;
+    }
+</script>

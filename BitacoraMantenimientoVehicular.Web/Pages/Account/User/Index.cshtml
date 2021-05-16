@@ -1,0 +1,142 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Web.Models
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Account.User.IndexModel
+@(Html.DevExtreme().DataGrid<UserViewModel>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("Account")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("Id")
+    )
+     .ID("gridContainer")
+    .AllowColumnReordering(true)
+    .AllowColumnResizing(true)
+    .ColumnAutoWidth(true)
+    .Export(e => e.Enabled(true))
+    .Editing(c => c
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .AllowAdding(true)
+        .Mode(GridEditMode.Popup)
+        .RefreshMode(GridEditRefreshMode.Reshape)
+        .Popup(e => e
+            .Title("User Info")
+            .ShowTitle(true)
+            .Width(700)
+            .Height(545)
+        )
+        .Form(f => f.Items(items =>
+        {
+            items.AddGroup()
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems =>
+                {
+                    groupItems.AddSimpleFor(m => m.FirstName).Editor(y => y.TextBox().Placeholder("Enter First Name of user").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.LastName).Editor(y => y.TextBox().Placeholder("Enter Last Name of user").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.PhoneNumber).Editor(y => y.TextBox().Placeholder("Enter Phone Number of user").ShowClearButton(true)).IsRequired(true);
+                });
+
+            items.AddGroup()
+                .Caption("User Details")
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems =>
+                {
+                    groupItems.AddSimpleFor(m => m.UserName)
+                        .ColSpan(2)
+                        .Editor(editor => editor.TextBox().Mode(TextBoxMode.Email).Height(50).ShowClearButton(true));
+                    groupItems.AddSimpleFor(m => m.Document).Editor(y => y.TextBox().Placeholder("Enter Document of user").ShowClearButton(true));
+                    groupItems.AddSimpleFor(m => m.Address).Editor(y => y.TextBox().Placeholder("Enter Address of user").ShowClearButton(true));
+                    groupItems.AddSimpleFor(m => m.UserFunctionId);
+                    groupItems.AddSimpleFor(m => m.IsEnable);
+                });
+        }))
+    )
+    .Grouping(grouping => grouping.AutoExpandAll(true))
+    .GroupPanel(groupPanel => groupPanel.Visible(true))
+    .Height(500)
+    .HeaderFilter(h => h.Visible(true))
+    .FocusedRowEnabled(true)
+    .FocusedRowIndex(0)
+    .FilterPanel(f => f.Visible(true))
+    .FilterRow(filterRow => filterRow
+        .Visible(true)
+        .ApplyFilter(GridApplyFilterMode.Auto)
+    )
+    .RowAlternationEnabled(true)
+    .RepaintChangesOnly(true)
+    .RemoteOperations(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Infinite))
+    .ShowBorders(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .ShowBorders(true)
+    .ShowRowLines(true)
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .OnExporting("exporting")
+    .Columns(columns => {
+
+        columns.AddFor(m => m.Id).Visible(false);
+        columns.AddFor(m => m.FirstName).AllowSearch(true).Width(100)
+            .Fixed(true).Caption("First Name");
+        columns.AddFor(m => m.LastName).AllowSearch(true).Width(100)
+            .Fixed(true).Caption("Last Name");
+        columns.AddFor(m => m.UserName).AllowSearch(true).Width(100)
+            .Fixed(true).Caption("Mail");
+        columns.AddFor(m => m.Telegram);
+        columns.AddFor(m => m.PhoneNumber).Caption("Phone Number")
+            .EditorOptions(new {
+                mask = "(00) 000-0000"
+            })
+            .ValidationRules(vr =>
+            {
+                vr.AddRequired().Message("Phone Number is required");
+
+            });
+        columns.AddFor(m => m.Document);
+        columns.AddFor(m => m.UserFunctionId).Caption("User Funcion")
+            .SetCellValue("setUserFunctionValue")
+            .Lookup(lookup => lookup
+                .DataSource(d => d.Mvc().Controller("Account").LoadAction("UserFunctionLookup").Key("Value"))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
+        columns.AddFor(m => m.IsEnable).AllowSearch(true);
+        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+    })
+    .Summary(s => s
+        .TotalItems(totalItems => {
+            totalItems.AddFor(t => t.Id).SummaryType(SummaryType.Count);
+        })
+    )
+    )
+)
+
+<script>
+    function setUserFunctionValue(rowData, value) {
+        rowData.UserFunctionId = value;
+    }
+
+    function exporting(e) {
+        var workbook = new window.ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet('User');
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: e.component,
+            worksheet: worksheet,
+            autoFilterEnabled: true
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ListUser.xlsx');
+            });
+        });
+        e.cancel = true;
+    }

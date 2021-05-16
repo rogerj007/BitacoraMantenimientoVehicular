@@ -1,0 +1,160 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Web.Models
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Vehicle.ListVehicle.IndexModel
+@(Html.DevExtreme().DataGrid<VehicleViewModel>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("Vehicle")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("Id")
+    )
+    .ID("gridContainer")
+    .AllowColumnReordering(true)
+    .AllowColumnResizing(true)
+    .ColumnAutoWidth(true)
+    .ColumnChooser(c => c.Enabled(true))
+    .Export(e => e.Enabled(true))
+    .Editing(c => c
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .Texts(t => t.DeleteRow("Remove")
+            .ConfirmDeleteMessage("Are you sure you want to remove this item?")
+            .ConfirmDeleteTitle("Remove Item"))
+        .AllowAdding(true)
+        .Mode(GridEditMode.Popup)
+        .RefreshMode(GridEditRefreshMode.Reshape)
+        .Popup(e => e
+            .Title("Vehicle Info")
+            .ShowTitle(true)
+            .Width(700)
+            .Height(545)
+        )
+        .Form(f => f.Items(items => {
+            items.AddGroup()
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems => {
+                    groupItems.AddSimpleFor(m => m.VehicleBrandId).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.ColorId).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.CountryId).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.FuelId).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.VehicleStatusId).IsRequired(true);
+
+                });
+
+            items.AddGroup()
+                .Caption("Vehicle Details")
+                .ColCount(2)
+                .ColSpan(2)
+                .Items(groupItems => {
+                    groupItems.AddSimpleFor(m => m.Name)
+                        .ColSpan(2)
+                        .Editor(editor => editor.TextArea().Placeholder("Enter Plaque of vehicle").Height(50));
+                    groupItems.AddSimpleFor(m => m.Year).Editor(y=>y.TextBox().Placeholder("Enter Year of vehicle").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.Vin).Editor(y => y.TextBox().Placeholder("Enter VIN of vehicle").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.Cylinder).Editor(y => y.TextBox().Placeholder("Enter Cylinder of vehicle").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.MotorSerial).Editor(y => y.TextBox().Placeholder("Enter Motor or Serial of vehicle").ShowClearButton(true)).IsRequired(true);
+                    groupItems.AddSimpleFor(m => m.KmHrActual).Editor(y => y.TextBox().Placeholder("Enter Km Actual of vehicle").ShowClearButton(true));
+                    groupItems.AddSimpleFor(m => m.IsEnable);
+                });
+        }))
+    )
+    .Grouping(grouping => grouping.AutoExpandAll(true))
+    .GroupPanel(groupPanel => groupPanel.Visible(true))
+    .Height(500)
+    .HeaderFilter(h => h.Visible(true))
+    .FocusedRowEnabled(true)
+    .FocusedRowIndex(0)
+    .FilterPanel(f => f.Visible(true))
+    .FilterRow(filterRow => filterRow
+        .Visible(true)
+        .ApplyFilter(GridApplyFilterMode.Auto)
+    )
+    .RowAlternationEnabled(true)
+    .LoadPanel(p => p.Enabled(true))
+    .RepaintChangesOnly(true)
+    .RemoteOperations(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Infinite))
+    .ShowBorders(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .ShowBorders(true)
+    .ShowRowLines(true)
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .OnExporting("exporting")
+    .Columns(columns =>
+    {
+
+        columns.AddFor(m => m.Id).Visible(false).AllowEditing(false);
+        columns.AddFor(m => m.Name).AllowSearch(true).Width(100)
+            .Fixed(true).Caption("Plaque").EditorOptions(new { maxLength = 7, required = true });
+        columns.AddFor(m => m.MotorSerial).EditorOptions(new { maxLength = 25, required = true });
+        columns.AddFor(m => m.Vin).EditorOptions(new { maxLength = 25, required = true });
+        columns.AddFor(m => m.Cylinder).EditorOptions(new { maxLength = 4, required = true });
+        columns.AddFor(m => m.Year).EditorOptions(new { maxLength = 4, required = true });
+        columns.AddFor(m => m.KmHrActual);
+        columns.AddFor(m => m.VehicleBrandId).EditorOptions(new { required = true })
+            .Lookup(lookup => lookup
+                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("VehicleBrandLookup").Key("Value"))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
+        columns.AddFor(m => m.CountryId).EditorOptions(new { required = true })
+           .Lookup(lookup => lookup
+               .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("CountryLookup").Key("Value"))
+               .ValueExpr("Value")
+               .DisplayExpr("Text")
+           );
+        columns.AddFor(m => m.FuelId).EditorOptions(new { required = true })
+           .Lookup(lookup => lookup
+               .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("FuelLookup").Key("Value"))
+               .ValueExpr("Value")
+               .DisplayExpr("Text")
+           );
+        columns.AddFor(m => m.ColorId).EditorOptions(new { required = true })
+          .Lookup(lookup => lookup
+              .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("ColorLookup").Key("Value"))
+              .ValueExpr("Value")
+              .DisplayExpr("Text")
+          );
+        columns.AddFor(m => m.VehicleStatusId).EditorOptions(new { required = true })
+            .Lookup(lookup => lookup
+                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("VehicleStatusLookup").Key("Value"))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
+        columns.AddFor(m => m.IsEnable).AllowSearch(true);
+        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+    })
+    .Summary(s => s
+        .TotalItems(totalItems => {
+            totalItems.AddFor(t => t.Id).SummaryType(SummaryType.Count);
+        })
+        )
+    )
+
+
+<script>
+    function exporting(e) {
+        var workbook = new window.ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet('Vehicle');
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: e.component,
+            worksheet: worksheet,
+            autoFilterEnabled: true
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ListVehicle.xlsx');
+            });
+        });
+        e.cancel = true;
+    }
+</script>
