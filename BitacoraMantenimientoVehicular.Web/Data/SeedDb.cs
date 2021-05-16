@@ -66,10 +66,10 @@ namespace BitacoraMantenimientoVehicular.Web.Data
 
         private async Task CheckUsersAsync()
         {
-            await CheckUserAsync("1010", "Admin", "Web", "demo@yopmail.com", "0998775584", "Calle Luna Calle Venus",telegram:"123456789",true);
-            await CheckUserAsync("1020", "Roger", "Jaimes", "rogerjh@yopmail.net", "0998580084", "Calle Luna Calle Tierra", telegram: "12344489",  true);
-            await CheckUserAsync("1030", "Oswaldo", "Aguinaga", "oswaldoa@yopmail.net", "0998585114", "Calle Luna Calle Marte", telegram: "123036789", true);
-            await CheckUserAsync("2020", "Cristian", "Rosado", "cristianr@yopmail.com", "0998547584", "Calle Luna Calle Jupiter", telegram: "123458889", true);
+            await CheckUserAsync("1010", "Admin", "Web", "demo@yopmail.com", "0998775584", "Calle Luna Calle Venus",telegram: "135198016", true);
+            await CheckUserAsync("1020", "Roger", "Jaimes", "rogerjh@yopmail.net", "0998580084", "Calle Luna Calle Tierra", telegram: "135198716",  true);
+            await CheckUserAsync("1030", "Oswaldo", "Aguinaga", "oswaldoa@yopmail.net", "0998585114", "Calle Luna Calle Marte", telegram: "135198017", true);
+            await CheckUserAsync("2020", "Cristian", "Rosado", "cristianr@yopmail.com", "0998547584", "Calle Luna Calle Jupiter", telegram: "135198015", true);
             await CheckUserAsync("3030", "Mauricio", "Torres", "mauriciot@yopmail.com", "0990505584", "Calle Luna Calle Pluton", telegram: "123456787",  true);
         }
 
@@ -263,14 +263,14 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                     await _dataContext.Client.AddRangeAsync(
                         new ClientEntity
                         {
-                            Name = "DARIO NARANJO",
+                            Name = "ROGER JAIMES",
                             CreatedDate = DateTime.UtcNow,
                             IsEnable = true,
-                            Dni="1234567890",
+                            Dni="1715150",
                             Mail="dnranjo@yopmail.com",
                             CellPhone="0898575844",
                             Phone="0324562600",
-                            Telegram="0000000000",
+                            Telegram= "135198010",
                             TelegramCode = "1234",
                             Address="Cuenca-Ecuador",
                             UserType=UserType.Owner
