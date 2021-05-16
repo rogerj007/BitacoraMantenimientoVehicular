@@ -1,5 +1,6 @@
 ﻿@page
 @using BitacoraMantenimientoVehicular.Datasource.Entities
+@using BitacoraMantenimientoVehicular.Datasource.Enums
 @using DevExtreme.AspNet.Mvc
 @model BitacoraMantenimientoVehicular.Web.Pages.Client.ListClient.IndexModel
 @(Html.DevExtreme().DataGrid<ClientEntity>()
@@ -42,6 +43,7 @@
                     groupItems.AddSimpleFor(m => m.Mail);
                     groupItems.AddSimpleFor(m => m.Phone);
                     groupItems.AddSimpleFor(m => m.CellPhone);
+                    groupItems.AddSimpleFor(m => m.UserType);
                     groupItems.AddSimpleFor(m => m.IsEnable);
                 });
 
@@ -134,6 +136,13 @@
             {
                 vr.AddRequired().Message("Cell Phone Number is required");
             });
+        
+            columns.AddFor(m => m.UserType)
+                .Lookup(lookup => lookup
+                    .DataSource(Html.GetEnumSelectList<UserType>().Select(i => new {Value = int.Parse(i.Value), Text = i.Text}))
+                    .ValueExpr("Value")
+                    .DisplayExpr("Text")
+                );
         columns.AddFor(m => m.Telegram).AllowSearch(true).EditorOptions(new { showClearButton = true });
         columns.AddFor(m => m.TelegramCode).EditorOptions(new {mask="0000", showClearButton = true });
         columns.AddFor(m => m.IsEnable).EditorOptions(new { showClearButton = true }).AllowSearch(true);

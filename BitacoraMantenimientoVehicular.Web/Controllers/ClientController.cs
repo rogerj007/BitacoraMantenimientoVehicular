@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Entities;
+using BitacoraMantenimientoVehicular.Datasource.Enums;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -73,15 +74,16 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             const string colorId = nameof(ClientEntity.Id);
             const string name = nameof(ClientEntity.Name);
             const string isEnable = nameof(ClientEntity.IsEnable);
-            const string ruc = nameof(ClientEntity.Dni);
+            const string dni = nameof(ClientEntity.Dni);
             const string mail = nameof(ClientEntity.Mail);
             const string phone = nameof(ClientEntity.Phone);
             const string cellphone = nameof(ClientEntity.CellPhone);
             const string telegram = nameof(ClientEntity.Telegram);
             const string telegramCode = nameof(ClientEntity.TelegramCode);
             const string address = nameof(ClientEntity.Address);
+            const string userType = nameof(ClientEntity.UserType);
 
-            if(values.Contains(colorId)) {
+            if (values.Contains(colorId)) {
                 model.Id = Convert.ToInt16(values[colorId]);
             }
 
@@ -92,8 +94,8 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                 model.IsEnable = Convert.ToBoolean(values[isEnable]);
             }
 
-            if(values.Contains(ruc)) {
-                model.Dni = Convert.ToString(values[ruc]);
+            if(values.Contains(dni)) {
+                model.Dni = Convert.ToString(values[dni]);
             }
 
             if(values.Contains(mail)) {
@@ -119,6 +121,11 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
 
             if(values.Contains(address)) {
                 model.Address = Convert.ToString(values[address]);
+            }
+
+            if (values.Contains(userType))
+            {
+               model.UserType = (UserType)Enum.Parse(typeof(UserType), values[userType].ToString() ?? string.Empty); 
             }
         }
 
