@@ -264,7 +264,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                             Name = "ROGER JAIMES",
                             CreatedDate = DateTime.UtcNow,
                             IsEnable = true,
-                            Dni="1715150",
+                            Dni="1715150182",
                             Mail="dnranjo@yopmail.com",
                             CellPhone="0898575844",
                             Phone="0324562600",

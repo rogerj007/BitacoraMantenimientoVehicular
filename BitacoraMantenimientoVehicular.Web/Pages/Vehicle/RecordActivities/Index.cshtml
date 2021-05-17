@@ -52,7 +52,7 @@
         columns.AddFor(m => m.Km);
         columns.AddFor(m => m.ClientId).EditorOptions(new { required = true })
             .Lookup(lookup => lookup
-                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("UserLookup").Key("Value"))
+                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("ClientLookup").Key("Value"))
                 .ValueExpr("Value")
                 .DisplayExpr("Text")
             );
