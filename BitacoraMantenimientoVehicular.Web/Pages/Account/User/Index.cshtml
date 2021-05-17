@@ -90,7 +90,6 @@
             .Fixed(true).Caption("Last Name");
         columns.AddFor(m => m.UserName).AllowSearch(true).Width(100)
             .Fixed(true).Caption("Mail");
-        columns.AddFor(m => m.Telegram);
         columns.AddFor(m => m.PhoneNumber).Caption("Phone Number")
             .EditorOptions(new {
                 mask = "(00) 000-0000"
@@ -101,13 +100,6 @@
 
             });
         columns.AddFor(m => m.Document);
-        columns.AddFor(m => m.UserFunctionId).Caption("User Funcion")
-            .SetCellValue("setUserFunctionValue")
-            .Lookup(lookup => lookup
-                .DataSource(d => d.Mvc().Controller("Account").LoadAction("UserFunctionLookup").Key("Value"))
-                .ValueExpr("Value")
-                .DisplayExpr("Text")
-            );
         columns.AddFor(m => m.IsEnable).AllowSearch(true);
         columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
         columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
@@ -121,10 +113,6 @@
 )
 
 <script>
-    function setUserFunctionValue(rowData, value) {
-        rowData.UserFunctionId = value;
-    }
-
     function exporting(e) {
         var workbook = new window.ExcelJS.Workbook();
         var worksheet = workbook.addWorksheet('User');
@@ -140,3 +128,4 @@
         });
         e.cancel = true;
     }
+</script>

@@ -49,7 +49,6 @@ namespace BitacoraMantenimientoVehicular.Datasource
            
 
             builder.Entity<UserEntity>().HasOne(u => u.UserFunction);
-
             builder.Entity<UserFunctionEntity>().HasOne(u => u.CreatedBy);
             builder.Entity<UserFunctionEntity>().HasOne(u => u.ModifiedBy);
         }

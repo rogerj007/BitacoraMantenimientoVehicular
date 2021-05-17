@@ -25,8 +25,7 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [DataType(DataType.DateTime)]
         public DateTime? ModifiedDate { get; set; }
         public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
-
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public VehicleEntity Vehicle { get; set; }
+        public ClientEntity RegisterBy { get; set; }
+        public virtual VehicleEntity Vehicle { get; set; }
     }
 }

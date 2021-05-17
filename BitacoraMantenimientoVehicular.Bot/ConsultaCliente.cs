@@ -30,21 +30,24 @@ namespace BitacoraMantenimientoVehicular.Bot
             try
             {
                 await using var context = _context.CreateDbContext();
-                var usuario = await context.Users.SingleOrDefaultAsync(u => u.Telegram == pTelegram.ToString());
+                var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == pTelegram.ToString());
                 var vehiculo = await context.Vehicle.SingleOrDefaultAsync(u => u.Name == pPlaque);
                 if (usuario == null)
-                    return "su usuario no existe";
+                    return "Su usuario no existe";
                 if (!usuario.IsEnable)
-                    return "su usuario esta deshabilitado";
+                    return "Su usuario esta deshabilitado";
                 if (vehiculo == null)
-                    return $"la placa del vehiculo {pPlaque} no existe";
-
-                var actividad = new VehicleRecordActivityEntity {Vehicle = vehiculo, Km = pKm, CreatedDate=DateTime.UtcNow};
+                    return $"La placa del vehiculo {pPlaque} no existe";
+               
+                var actividad = new VehicleRecordActivityEntity {Vehicle = vehiculo, Km = pKm, CreatedDate=DateTime.UtcNow, RegisterBy=usuario};
                 context.Add(actividad);
                 await context.SaveChangesAsync();
-                return $"Estimado el registro de la placa {pPlaque} fue asignado correctamente registrado\n";
+                var existeMantenimiento=await ValidarMantenimiento(vehiculo, pKm);
+                var mensaje=new StringBuilder($"Estimado el registro de la placa {pPlaque.ToUpper()} fue asignado correctamente registrado\n");
+                if (!string.IsNullOrEmpty(existeMantenimiento))
+                    mensaje.Append(existeMantenimiento);
 
-
+                return mensaje.ToString();
             }
             catch (InvalidOperationException exception)
             {
@@ -57,6 +60,23 @@ namespace BitacoraMantenimientoVehicular.Bot
                 return "Error en registrar actividad";
             }
 
+        }
+
+
+        public async Task<string> ValidarMantenimiento(VehicleEntity vehicle, long pKm)
+        {
+            try
+            {
+                await using var context = _context.CreateDbContext();
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return "Error en Validar Mantenimiento";
+            }
+            return string.Empty;
         }
     }
 }

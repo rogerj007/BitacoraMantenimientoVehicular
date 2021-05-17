@@ -66,11 +66,11 @@ namespace BitacoraMantenimientoVehicular.Web.Data
 
         private async Task CheckUsersAsync()
         {
-            await CheckUserAsync("1010", "Admin", "Web", "demo@yopmail.com", "0998775584", "Calle Luna Calle Venus",telegram: "135198016", true);
-            await CheckUserAsync("1020", "Roger", "Jaimes", "rogerjh@yopmail.net", "0998580084", "Calle Luna Calle Tierra", telegram: "135198716",  true);
-            await CheckUserAsync("1030", "Oswaldo", "Aguinaga", "oswaldoa@yopmail.net", "0998585114", "Calle Luna Calle Marte", telegram: "135198017", true);
-            await CheckUserAsync("2020", "Cristian", "Rosado", "cristianr@yopmail.com", "0998547584", "Calle Luna Calle Jupiter", telegram: "135198015", true);
-            await CheckUserAsync("3030", "Mauricio", "Torres", "mauriciot@yopmail.com", "0990505584", "Calle Luna Calle Pluton", telegram: "123456787",  true);
+            await CheckUserAsync("1010", "Admin", "Web", "demo@yopmail.com", "0998775584", "Calle Luna Calle Venus", true);
+            await CheckUserAsync("1020", "Roger", "Jaimes", "rogerjh@yopmail.net", "0998580084", "Calle Luna Calle Tierra",   true);
+            await CheckUserAsync("1030", "Oswaldo", "Aguinaga", "oswaldoa@yopmail.net", "0998585114", "Calle Luna Calle Marte", true);
+            await CheckUserAsync("2020", "Cristian", "Rosado", "cristianr@yopmail.com", "0998547584", "Calle Luna Calle Jupiter",  true);
+            await CheckUserAsync("3030", "Mauricio", "Torres", "mauriciot@yopmail.com", "0990505584", "Calle Luna Calle Pluton",  true);
         }
 
         private async Task<UserEntity> CheckUserAsync(
@@ -80,7 +80,6 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             string email,
             string phone,
             string address,
-            string telegram,
             bool enable
             )
         {
@@ -94,7 +93,6 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 UserName = email,
                 PhoneNumber = phone,
                 Address = address,
-                Telegram=telegram,
                 Document = document,
                 IsEnable =enable
               
@@ -152,17 +150,17 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 if (!_dataContext.MaintenanceTask.Any())
                 {
                     await _dataContext.MaintenanceTask.AddRangeAsync(
-                        new MaintenanceTaskEntity { Name = "CAMBIO TRAMPA DE AGUA", CreatedDate = DateTime.UtcNow, IsEnable = true, Km= (short)new Random().Next(5,500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 5000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE ACEITE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 5000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO ACEITE HIDRAULICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 2500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE SECUNDARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 1000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE PRIMARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 500) },
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE SEGURO DE PUERTAS", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 500) },
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE ENCENDIDO DE MOTOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 1500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO BATERIA Y REVISION DE SISTEMA ELECTRICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 700)},
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE RADIADOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(5, 500) }
+                        new MaintenanceTaskEntity { Name = "CAMBIO TRAMPA DE AGUA", CreatedDate = DateTime.UtcNow, IsEnable = true, Km= (short)new Random().Next(100,500) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 5000) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE ACEITE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 5000) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO ACEITE HIDRAULICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 2500) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE SECUNDARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 1000) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE PRIMARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
+                        new MaintenanceTaskEntity { Name = "ARREGLO DE SEGURO DE PUERTAS", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
+                        new MaintenanceTaskEntity { Name = "ARREGLO DE ENCENDIDO DE MOTOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 1500) },
+                        new MaintenanceTaskEntity { Name = "CAMBIO BATERIA Y REVISION DE SISTEMA ELECTRICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 700)},
+                        new MaintenanceTaskEntity { Name = "ARREGLO DE RADIADOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(1000, 20500) }
                     );
                     await _dataContext.SaveChangesAsync();
                 }
@@ -270,7 +268,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                             Mail="dnranjo@yopmail.com",
                             CellPhone="0898575844",
                             Phone="0324562600",
-                            Telegram= "135198010",
+                            Telegram= "135198016",
                             TelegramCode = "1234",
                             Address="Cuenca-Ecuador",
                             UserType=UserType.Owner

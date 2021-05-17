@@ -138,18 +138,21 @@ namespace BitacoraMantenimientoVehicular.Bot
             });
 
             //Add AddDbContext
-            serviceCollection.AddDbContext<DataContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnectionV2"), providerOptions =>
+            serviceCollection.AddDbContextFactory<DataContext>(options =>
             {
-                providerOptions.EnableRetryOnFailure();
-                providerOptions.CommandTimeout(360);
-            }), ServiceLifetime.Transient);
-            
+                options.UseSqlServer(_configuration.GetConnectionString("DefaultConnectionV2"), providerOptions =>
+                {
+                    providerOptions.EnableRetryOnFailure();
+                    providerOptions.CommandTimeout(360);
+                });
+            });
 
             // Add access to generic IConfigurationRoot
             serviceCollection.AddSingleton(_configuration);
             // Add app
             serviceCollection.AddScoped<EnvioAlertaTelegram>();
-         
+            serviceCollection.AddScoped<ConsultaCliente>();
+
         }
 
 
@@ -300,7 +303,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             var mensajeTelegram = message.Text.ToLower().Replace("/registro ", "").ToLower().Split(' ');
                             await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
                             await Task.Delay(500);
-                            if (mensajeTelegram.Length != 3)
+                            if (mensajeTelegram.Length != 2)
                             {
                                 var mensaje =
                                     $"{mensajeBase} escribe bien los parametros\nEjemplo: <b>/registro placa KM (ultimo) </b>";
@@ -314,10 +317,19 @@ namespace BitacoraMantenimientoVehicular.Bot
                             }
                             else
                             {
-                                var placa = mensajeTelegram[1];
-                                var km = mensajeTelegram[2];
-                                var _consulta = _serviceProvider.GetService<ConsultaCliente>();
-                                var mensaje = _consulta.RegistroActividadAsync(placa,km, message.From.Id);
+                                var placa = mensajeTelegram[0];
+                                var km = Convert.ToInt64(mensajeTelegram[1]);
+                                var consulta = _serviceProvider.GetService<ConsultaCliente>();
+                                if (consulta != null)
+                                {
+                                    var mensaje = await consulta.RegistroActividadAsync(placa,km, message.From.Id);
+                                    await Bot.SendTextMessageAsync(
+                                        chatId: message.Chat.Id,
+                                        text: mensaje,
+                                        parseMode: ParseMode.Html,
+                                        replyMarkup: new ReplyKeyboardRemove()
+                                    );
+                                }
                             }
                         }
 

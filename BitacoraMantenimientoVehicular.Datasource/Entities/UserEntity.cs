@@ -35,10 +35,6 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [Display(Name = "Picture")]
         public string? PicturePath { get; set; }
 
-        [Display(Name = "Telegram")]
-        [StringLength(25, MinimumLength = 5)]
-        public string? Telegram { get; set; }
-
         public string FullName => $"{FirstName} {LastName}";
 
         public string FullNameWithDocument => $"{FirstName} {LastName} - {Document}";

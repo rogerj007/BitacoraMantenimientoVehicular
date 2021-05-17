@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevExtreme NuGet.config", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitacoraMantenimientoVehicular.Web", "BitacoraMantenimientoVehicular.Web\BitacoraMantenimientoVehicular.Web.csproj", "{F29B50D9-29DB-48A9-8328-33A1C424CB14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitacoraMantenimientoVehicular.Datasource", "BitacoraMantenimientoVehicular.Datasource\BitacoraMantenimientoVehicular.Datasource.csproj", "{8E5C176E-43BF-4EFF-913F-AB8B6AE2926D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitacoraMantenimientoVehicular.Datasource", "BitacoraMantenimientoVehicular.Datasource\BitacoraMantenimientoVehicular.Datasource.csproj", "{8E5C176E-43BF-4EFF-913F-AB8B6AE2926D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitacoraMantenimientoVehicular.Bot", "BitacoraMantenimientoVehicular.Bot\BitacoraMantenimientoVehicular.Bot.csproj", "{95C8A68A-FB88-4372-9F5E-4BC6F9EBF4F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitacoraMantenimientoVehicular.Bot", "BitacoraMantenimientoVehicular.Bot\BitacoraMantenimientoVehicular.Bot.csproj", "{95C8A68A-FB88-4372-9F5E-4BC6F9EBF4F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

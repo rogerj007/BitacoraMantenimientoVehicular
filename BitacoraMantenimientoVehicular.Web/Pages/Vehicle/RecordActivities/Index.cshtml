@@ -1,0 +1,86 @@
+﻿@page
+@using BitacoraMantenimientoVehicular.Web.Models
+@using DevExtreme.AspNet.Mvc
+@model BitacoraMantenimientoVehicular.Web.Pages.Vehicle.RecordActivities.IndexModel
+@(Html.DevExtreme().DataGrid<VehicleRecordActivityViewModel>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("Vehicle")
+        .LoadAction("GetActivity")
+        .Key("Id")
+    )
+    .ID("gridContainer")
+    .AllowColumnReordering(true)
+    .AllowColumnResizing(true)
+    .ColumnAutoWidth(true)
+    .ColumnChooser(c => c.Enabled(true))
+    .Export(e => e.Enabled(true))
+    .Grouping(grouping => grouping.AutoExpandAll(true))
+    .GroupPanel(groupPanel => groupPanel.Visible(true))
+    .Height(500)
+    .HeaderFilter(h => h.Visible(true))
+    .FocusedRowEnabled(true)
+    .FocusedRowIndex(0)
+    .FilterPanel(f => f.Visible(true))
+    .FilterRow(filterRow => filterRow
+        .Visible(true)
+        .ApplyFilter(GridApplyFilterMode.Auto)
+    )
+    .RowAlternationEnabled(true)
+    .LoadPanel(p => p.Enabled(true))
+    .RepaintChangesOnly(true)
+    .RemoteOperations(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Infinite))
+    .ShowBorders(true)
+    .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .ShowBorders(true)
+    .ShowRowLines(true)
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .OnExporting("exporting")
+    .Columns(columns => {
+
+        columns.AddFor(m => m.VehicleId).EditorOptions(new { required = true })
+            .Lookup(lookup => lookup
+                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("VehicleLookup").Key("Value"))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
+
+        columns.AddFor(m => m.Km);
+        columns.AddFor(m => m.ClientId).EditorOptions(new { required = true })
+            .Lookup(lookup => lookup
+                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("UserLookup").Key("Value"))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
+        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+    })
+    .Summary(s => s
+        .TotalItems(totalItems => {
+                                      totalItems.AddFor(t => t.Id).SummaryType(SummaryType.Count);
+        })
+    )
+    )
+
+
+<script>
+    function exporting(e) {
+        var workbook = new window.ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet('Records');
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: e.component,
+            worksheet: worksheet,
+            autoFilterEnabled: true
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ListActivitiesVehicle.xlsx');
+            });
+        });
+        e.cancel = true;
+    }
+</script>

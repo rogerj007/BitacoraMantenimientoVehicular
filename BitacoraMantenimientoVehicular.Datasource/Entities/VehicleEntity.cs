@@ -67,7 +67,7 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public ColorEntity Color { get; set; }
         public VehicleStatusEntity VehicleStatus { get; set; }
 
-        public ICollection<VehicleRecordActivityEntity> VehicleRecordActivities { get; set; }
+        public virtual ICollection<VehicleRecordActivityEntity> VehicleRecordActivities { get; set; }
 
     }
 }

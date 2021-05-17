@@ -195,6 +195,11 @@
                                 .Icon("car")
                                 .Option("path", GetUrl("Vehicle/ListVehicle/Index"))
                                 .Selected(IsCurrentUrl("Vehicle/ListVehicle/Index"));
+                            subItems.Add()
+                                .Text("Record Activities")
+                                .Icon("showpane")
+                                .Option("path", GetUrl("Vehicle/RecordActivities/Index"))
+                                .Selected(IsCurrentUrl("Vehicle/RecordActivities/Index"));
                         });
 
 

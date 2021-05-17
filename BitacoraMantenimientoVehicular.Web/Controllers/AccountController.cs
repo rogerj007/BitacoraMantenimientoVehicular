@@ -47,7 +47,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                         UserFunctionId = v.UserFunction.Id,
                         PhoneNumber = v.PhoneNumber,
                         Document = v.Document,
-                        Telegram = v.Telegram,
+                    
                         CreatedDate = v.CreatedDate,
                         ModifiedDate = v.ModifiedDate,
                         IsEnable = v.IsEnable,
@@ -139,7 +139,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             const string phoneNumber = nameof(UserViewModel.PhoneNumber);
             const string firstName = nameof(UserViewModel.FirstName);
             const string lastName = nameof(UserViewModel.LastName);
-            const string telegram = nameof(UserViewModel.Telegram);
+     
             const string address = nameof(UserViewModel.Address);
             const string isEnable = nameof(UserViewModel.IsEnable);
             const string userName = nameof(UserViewModel.UserName);
@@ -167,19 +167,13 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             {
                 model.IsEnable = Convert.ToBoolean(values[isEnable]);
             }
-
             if (values.Contains(firstName))
             {
                 model.FirstName = Convert.ToString(values[firstName])?.ToUpper() ?? string.Empty;
             }
-
             if (values.Contains(lastName))
             {
                 model.LastName = Convert.ToString(values[lastName])?.ToUpper() ?? string.Empty;
-            }
-            if (values.Contains(telegram))
-            {
-                model.Telegram = Convert.ToString(values[telegram]);
             }
             if (values.Contains(address))
             {

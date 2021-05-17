@@ -54,6 +54,23 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             return Json(await DataSourceLoader.LoadAsync(model, loadOptions));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetActivity(DataSourceLoadOptions loadOptions)
+        {
+            var model = _context.VehicleRecordActivities.AsNoTracking()
+                .Select(v => new VehicleRecordActivityViewModel
+                {
+                    Id = v.Id,
+                    VehicleId=v.Vehicle.Id,
+                    Km=v.Km,
+                    ClientId=v.RegisterBy.Id,
+                    CreatedDate = v.CreatedDate,
+                    ModifiedDate = v.ModifiedDate
+                  
+                });
+            return Json(await DataSourceLoader.LoadAsync(model, loadOptions));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(string values) {
             try
@@ -137,6 +154,19 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ClientLookup(DataSourceLoadOptions loadOptions)
+        {
+            var lookup = _context.Client.AsNoTracking().OrderBy(i => i.Name).Select(i => new { Value = i.Id, Text = i.Name });
+            return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VehicleLookup(DataSourceLoadOptions loadOptions)
+        {
+            var lookup = _context.Vehicle.OrderBy(i => i.Name).Select(i => new {Value = i.Id, Text = i.Name});
+            return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
+        }
+        [HttpGet]
         public async Task<IActionResult> VehicleStatusLookup(DataSourceLoadOptions loadOptions)
         {
             var lookup = from i in _context.VehicleStatus
@@ -158,9 +188,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
-
-       
-
         [HttpGet]
         public async Task<IActionResult> CountryLookup(DataSourceLoadOptions loadOptions) {
             var lookup = from i in _context.Country
@@ -171,7 +198,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
-
         [HttpGet]
         public async Task<IActionResult> FuelLookup(DataSourceLoadOptions loadOptions) {
             var lookup = from i in _context.Fuel
@@ -182,7 +208,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
-
         [HttpGet]
         public async Task<IActionResult> ColorLookup(DataSourceLoadOptions loadOptions) {
             var lookup = from i in _context.Color
@@ -193,7 +218,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
-
         private async Task PopulateModel(VehicleViewModel model, IDictionary values) {
 
             try
@@ -302,21 +326,13 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             //dto.Color = await _context.Color.FindAsync(model.ColorId);
 
         }
-
         private T ConvertTo<T>(object value) {
             var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));
             return (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
         }
-
         private string GetFullErrorMessage(ModelStateDictionary modelState) {
-            var messages = new List<string>();
-
-            foreach(var entry in modelState) {
-                foreach(var error in entry.Value.Errors)
-                    messages.Add(error.ErrorMessage);
-            }
-
-            return String.Join(" ", messages);
+            var messages = (from entry in modelState from error in entry.Value.Errors select error.ErrorMessage).ToList();
+            return string.Join(" ", messages);
         }
     }
 }
