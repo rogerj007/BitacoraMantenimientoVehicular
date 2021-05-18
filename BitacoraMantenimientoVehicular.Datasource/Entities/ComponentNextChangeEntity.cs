@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BitacoraMantenimientoVehicular.Datasource.Entities
 {
-    public class MaintenanceTaskEntity 
+    public class ComponentNextChangeEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public short Id { get; set; }
-
-        [Display(Name = "Maintenance Task")]
-        [Required]
-        [StringLength(100, MinimumLength = 10)]
-        [MaxLength(100)]
-        public string Name { get; set; }
+        public Guid Id { get; set; }
 
         [Column(TypeName = "datetime2")]
         [DataType(DataType.DateTime)]
@@ -26,11 +19,18 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [DataType(DataType.DateTime)]
         public DateTime? ModifiedDate { get; set; }
         public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
-        public UserEntity CreatedBy { get; set; }
-        public UserEntity ModifiedBy { get; set; }
-        public bool IsEnable { get; set; }
-       
-        public short Km { get; set; }
+
+
+        [Display(Name = "Km")]
+        [Required]
+        [Range(1, long.MaxValue)]
+        public long Km { get; set; }
+
+        public bool IsComplete { get; set; }
+
+        public virtual VehicleEntity Vehicle { get; set; }
+
+        public ComponentEntity Component { get; set; }
 
 
     }

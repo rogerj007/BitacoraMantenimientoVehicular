@@ -1,22 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BitacoraMantenimientoVehicular.Datasource.Entities
 {
-    public class UserFunctionEntity
+    public class ClientEntityVehicleEntity
     {
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public byte Id { get; set; }
-
-        [Display(Name = "User Function")]
-        [Required]
-        [StringLength(50, MinimumLength = 2)]
-        [MaxLength(50)]
-        public string Name { get; set; }
-
+        public Guid Id { get; set; }
 
         [Column(TypeName = "datetime2")]
         [DataType(DataType.DateTime)]
@@ -31,5 +27,9 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public UserEntity ModifiedBy { get; set; }
 
         public bool IsEnable { get; set; }
+
+        public virtual ClientEntity ClientEntity { get; set; }
+
+        public virtual VehicleEntity VehicleEntity { get; set; }
     }
 }

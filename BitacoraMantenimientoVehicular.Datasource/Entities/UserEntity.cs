@@ -53,12 +53,5 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public DateTime? ModifiedDate { get; set; }
         public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
 
-       
-        [Display(Name = "User Function")]
-        [ForeignKey("UserFunctionId")]
-        public  virtual UserFunctionEntity? UserFunction { get; set; }
-
-      
-
     }
 }

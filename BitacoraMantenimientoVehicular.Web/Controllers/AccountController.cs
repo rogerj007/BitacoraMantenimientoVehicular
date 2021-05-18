@@ -37,14 +37,13 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
         {
             try
             {
-                var model = _context.Users.Include(r => r.UserFunction).AsNoTracking()
+                var model = _context.Users.AsNoTracking()
                     .Select(v => new UserViewModel
                     {
                         Id = v.Id,
                         FirstName = v.FirstName,
                         LastName = v.LastName,
                         UserName = v.UserName,
-                        UserFunctionId = v.UserFunction.Id,
                         PhoneNumber = v.PhoneNumber,
                         Document = v.Document,
                     
@@ -86,7 +85,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             try
             {
                 var model = await _context.Users
-                    .Include(c => c.UserFunction)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(item => item.Id == key);
                 var modelViewModel = _mapper.Map<UserViewModel>(model);
@@ -119,18 +117,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<IActionResult> UserFunctionLookup(DataSourceLoadOptions loadOptions)
-        {
-            var lookup = from i in _context.UserFunction
-                orderby i.Name
-                select new
-                {
-                    Value = i.Id,
-                    Text = i.Name
-                };
-            return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
-        }
+      
 
         private async Task PopulateModel(UserViewModel model, IDictionary values)
         {
@@ -143,9 +130,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             const string address = nameof(UserViewModel.Address);
             const string isEnable = nameof(UserViewModel.IsEnable);
             const string userName = nameof(UserViewModel.UserName);
-            const string userFuncionId = nameof(UserViewModel.UserFunctionId);
-
-
+        
             if (values.Contains(id))
             {
                 model.Id = Convert.ToString(values[id]);
@@ -179,11 +164,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             {
                 model.Address = Convert.ToString(values[address])?.ToUpper() ?? string.Empty;
             }
-            if (values.Contains(userFuncionId))
-            {
-                model.UserFunctionId = Convert.ToByte(values[userFuncionId]);
-                model.UserFunction = await _context.UserFunction.FindAsync(model.UserFunctionId);
-            }
+          
 
 
         }

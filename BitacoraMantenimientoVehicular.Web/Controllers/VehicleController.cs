@@ -43,7 +43,8 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                     Vin=v.Vin,
                     Cylinder=v.Cylinder,
                     Year=v.Year,
-                    KmHrActual=v.KmHrActual,
+                    KmActual=v.KmActual,
+                    KmRegistro=v.KmRegistro,
                     ImageUrl=v.ImageUrl,
                     VehicleBrandId= v.VehicleBrand.Id,
                     CountryId=v.Country.Id,
@@ -84,6 +85,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                 if (!TryValidateModel(model,nameof(model)))
                     return BadRequest(GetFullErrorMessage(ModelState));
                 var vehicle = _mapper.Map<VehicleEntity>(model);
+                vehicle.KmActual = vehicle.KmRegistro;
                 var result = _context.Add(vehicle);
                 await _context.SaveChangesAsync();
                 return Json(new { result.Entity.Id });
@@ -153,6 +155,62 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             await _context.SaveChangesAsync();
         }
 
+
+        #region Details clients
+
+        [HttpGet]
+        public async Task<IActionResult> GetDetailsClients(Guid id, DataSourceLoadOptions loadOptions)
+        {
+            var model = _context.ClientEntityVehicle.Where(e => e.VehicleEntity.Id.Equals(id)).AsNoTracking()
+                .Select(v => new ClientEntityVehicleViewModel
+                {
+                    Id = v.Id,
+                    CreatedDate = v.CreatedDate,
+                    ModifiedDate = v.ModifiedDate,
+                    IsEnable = v.IsEnable,
+                    VehicleId=v.VehicleEntity.Id,
+                    ClientId=v.ClientEntity.Id
+                });
+
+            return Json(await DataSourceLoader.LoadAsync(model, loadOptions));
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> PostDetailsClients(string values)
+        {
+            try
+            {
+                var model = new ClientEntityVehicleViewModel();
+                var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
+                await PopulateModel(model, valuesDict);
+                model.CreatedDate = DateTime.UtcNow;
+                var user = await _context.Users.FirstAsync(u => u.UserName.Equals(User.Identity.Name));
+                model.CreatedBy = user;
+                var vehicle = _mapper.Map<ClientEntityVehicleEntity>(model);
+                var result = _context.Add(vehicle);
+                await _context.SaveChangesAsync();
+                return Json(new { result.Entity.Id });
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("Message", e.Message);
+                if (e.InnerException != null) ModelState.AddModelError("InnerException", e.InnerException.ToString());
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                }
+
+            }
+            return BadRequest();
+        }
+
+
+        #endregion
+
+        #region Lookups
+
         [HttpGet]
         public async Task<IActionResult> ClientLookup(DataSourceLoadOptions loadOptions)
         {
@@ -163,61 +221,73 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> VehicleLookup(DataSourceLoadOptions loadOptions)
         {
-            var lookup = _context.Vehicle.OrderBy(i => i.Name).Select(i => new {Value = i.Id, Text = i.Name});
+            var lookup = _context.Vehicle.OrderBy(i => i.Name).Select(i => new { Value = i.Id, Text = i.Name });
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
         [HttpGet]
         public async Task<IActionResult> VehicleStatusLookup(DataSourceLoadOptions loadOptions)
         {
             var lookup = from i in _context.VehicleStatus
-                orderby i.Name
-                select new
-                {
-                    Value = i.Id,
-                    Text = i.Name
-                };
+                         orderby i.Name
+                         select new
+                         {
+                             Value = i.Id,
+                             Text = i.Name
+                         };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
         [HttpGet]
-        public async Task<IActionResult> VehicleBrandLookup(DataSourceLoadOptions loadOptions) {
+        public async Task<IActionResult> VehicleBrandLookup(DataSourceLoadOptions loadOptions)
+        {
             var lookup = from i in _context.VehicleBrand
                          orderby i.Name
-                         select new {
+                         select new
+                         {
                              Value = i.Id,
                              Text = i.Name
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
         [HttpGet]
-        public async Task<IActionResult> CountryLookup(DataSourceLoadOptions loadOptions) {
+        public async Task<IActionResult> CountryLookup(DataSourceLoadOptions loadOptions)
+        {
             var lookup = from i in _context.Country
                          orderby i.Name
-                         select new {
+                         select new
+                         {
                              Value = i.Id,
                              Text = i.Name
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
         [HttpGet]
-        public async Task<IActionResult> FuelLookup(DataSourceLoadOptions loadOptions) {
+        public async Task<IActionResult> FuelLookup(DataSourceLoadOptions loadOptions)
+        {
             var lookup = from i in _context.Fuel
                          orderby i.Name
-                         select new {
+                         select new
+                         {
                              Value = i.Id,
                              Text = i.Name
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
         [HttpGet]
-        public async Task<IActionResult> ColorLookup(DataSourceLoadOptions loadOptions) {
+        public async Task<IActionResult> ColorLookup(DataSourceLoadOptions loadOptions)
+        {
             var lookup = from i in _context.Color
                          orderby i.Name
-                         select new {
+                         select new
+                         {
                              Value = i.Id,
                              Text = i.Name
                          };
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
+
+        #endregion
+
+
         private async Task PopulateModel(VehicleViewModel model, IDictionary values) {
 
             try
@@ -229,7 +299,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                 const string vin = nameof(VehicleViewModel.Vin);
                 const string cylinder = nameof(VehicleViewModel.Cylinder);
                 const string year = nameof(VehicleViewModel.Year);
-                const string kmHrActual = nameof(VehicleViewModel.KmHrActual);
+                const string kmRegistro = nameof(VehicleViewModel.KmRegistro);
                 const string imageUrl = nameof(VehicleViewModel.ImageUrl);
                 const string brandId = nameof(VehicleViewModel.VehicleBrandId);
                 const string colorId = nameof(VehicleViewModel.ColorId);
@@ -271,9 +341,9 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                     model.Year = Convert.ToInt16(values[year]);
                 }
 
-                if (values.Contains(kmHrActual))
+                if (values.Contains(kmRegistro))
                 {
-                    model.KmHrActual = Convert.ToInt64(values[kmHrActual]);
+                    model.KmRegistro = Convert.ToInt64(values[kmRegistro]);
                 }
 
                 if (values.Contains(imageUrl))
@@ -325,6 +395,46 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             //dto.Fuel = await _context.Fuel.FindAsync(model.FuelId);
             //dto.Color = await _context.Color.FindAsync(model.ColorId);
 
+        }
+
+        private async Task PopulateModel(ClientEntityVehicleViewModel model, IDictionary values)
+        {
+
+            try
+            {
+                const string id = nameof(ClientEntityVehicleViewModel.Id);
+                const string isEnable = nameof(ClientEntityVehicleViewModel.IsEnable);
+                const string clientId = nameof(ClientEntityVehicleViewModel.ClientId);
+                const string vehicleId = nameof(ClientEntityVehicleViewModel.VehicleId);
+
+
+                if (values.Contains(id))
+                {
+                    model.Id = ConvertTo<Guid>(values[id]);
+                }
+               
+                if (values.Contains(isEnable))
+                {
+                    model.IsEnable = Convert.ToBoolean(values[isEnable]);
+                }
+                if (values.Contains(clientId))
+                {
+                    model.ClientId = Convert.ToInt16(values[clientId]);
+                    model.ClientEntity = await _context.Client.FindAsync(model.ClientId);
+                }
+                if (values.Contains(vehicleId))
+                {
+                    model.VehicleId = ConvertTo<Guid>(values[vehicleId]);
+                    model.VehicleEntity = await _context.Vehicle.FindAsync(model.VehicleId);
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+            }
         }
         private T ConvertTo<T>(object value) {
             var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));

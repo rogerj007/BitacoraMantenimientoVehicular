@@ -11,10 +11,14 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [Display(Name = "Km ")]
+        [Display(Name = "Km")]
         [Required]
         [Range(1, long.MaxValue)]
         public long Km { get; set; }
+
+        public decimal? Longitud { get; set; }
+        public decimal? Latitud { get; set; }
+
 
         [Column(TypeName = "datetime2")]
         [DataType(DataType.DateTime)]

@@ -51,7 +51,6 @@
                         .Editor(editor => editor.TextBox().Mode(TextBoxMode.Email).Height(50).ShowClearButton(true));
                     groupItems.AddSimpleFor(m => m.Document).Editor(y => y.TextBox().Placeholder("Enter Document of user").ShowClearButton(true));
                     groupItems.AddSimpleFor(m => m.Address).Editor(y => y.TextBox().Placeholder("Enter Address of user").ShowClearButton(true));
-                    groupItems.AddSimpleFor(m => m.UserFunctionId);
                     groupItems.AddSimpleFor(m => m.IsEnable);
                 });
         }))

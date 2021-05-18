@@ -131,7 +131,6 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
 
         private string GetFullErrorMessage(ModelStateDictionary modelState) {
             var messages = (from entry in modelState from error in entry.Value.Errors select error.ErrorMessage).ToList();
-
             return string.Join(" ", messages);
         }
     }

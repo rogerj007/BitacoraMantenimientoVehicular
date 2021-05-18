@@ -153,10 +153,7 @@ namespace BitacoraMantenimientoVehicular.Web.Helpers
 
         public async Task<UserEntity> GetUserAsync(Guid userId)
         {
-            return await _context.Users
-                .Include(u => u.UserFunction)
-                //.Include(u => u.UserType)
-                .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.ToString());
         }
     }
 

@@ -196,173 +196,194 @@ namespace BitacoraMantenimientoVehicular.Bot
             switch (message.Type)
             {
                 default:
+                {
+                    if (message.Type == MessageType.Location)
                     {
-                        if (message.Type != MessageType.Text)
-                            return;
+                        await UpdateLocationVehicle(message);
+                    }
+                    if (message.Type != MessageType.Text)
+                        return;
 
-                        var action = (message.Text.ToLower().Split(' ').First()) switch
-                        {
-                            "/start" => SendWelcomeMessages(message),
-                            "/online" => SendStatusdUser(message),
-                            "/offline" => SendStatusdUser(message, false),
-                            "/helpgroup" => SendHelpGroup(message),
-                            "/infouser" => SendInfoUser(message),
-                            "/registro" => UpdateRecordVehicle(message),
-                            "/request" => RequestContactAndLocation(message),
-                            _ => Usage(message)
-                        };
-                        await action;
+                    var action = (message.Text.ToLower().Split(' ').First()) switch
+                    {
+                        "/start" => SendWelcomeMessages(message),
+                        "/online" => SendStatusdUser(message),
+                        "/offline" => SendStatusdUser(message, false),
+                        "/helpgroup" => SendHelpGroup(message),
+                        "/infouser" => SendInfoUser(message),
+                        "/registro" => UpdateRecordVehicle(message),
+                      
+                        _ => Usage(message)
+                    };
+                    await action;
 
                       
 
-                        #region Mensajes de Texto
+                    #region Mensajes de Texto
 
 
-                        static async Task SendWelcomeMessages(Message message)
+                    static async Task SendWelcomeMessages(Message message)
+                    {
+                        var inicioMensaje = DateTime.Now.Hour switch
                         {
-                            var inicioMensaje = DateTime.Now.Hour switch
-                            {
-                                >= 0 and < 12 => "Hola buen dia",
-                                > 12 and <= 18 => "Hola buenas tardes",
-                                > 18 and < 23 => "Hola buenas noches",
-                                _ => string.Empty
-                            };
+                            >= 0 and < 12 => "Hola buen dia",
+                            > 12 and <= 18 => "Hola buenas tardes",
+                            > 18 and < 23 => "Hola buenas noches",
+                            _ => string.Empty
+                        };
 
-                            var mensajeBase = $"{inicioMensaje}, <b>{message.From.FirstName} {message.From.LastName}</b>";
+                        var mensajeBase = $"{inicioMensaje}, <b>{message.From.FirstName} {message.From.LastName}</b>";
+                        await Bot.SendTextMessageAsync(
+                            chatId: message.Chat.Id,
+                            text: mensajeBase,
+                            parseMode: ParseMode.Html,
+                            replyMarkup: new ReplyKeyboardRemove()
+                        );
+                    }
+
+                    static Task SendStatusdUser(Message message, bool pTipo = true)
+                    {
+                        var inicioMensaje = DateTime.Now.Hour switch
+                        {
+                            >= 0 and < 12 => pTipo ? "Hola buen dia" : "Buen dia, hasta Luego",
+                            > 12 and <= 18 => pTipo ? "Hola buenas tardes" : "Buenas tardes, hasta Luego",
+                            > 18 and < 23 => pTipo ? "Hola buenas noches" : "Buenas noches, hasta Luego",
+                            _ => string.Empty
+                        };
+
+                        var mensajeBase = $"{inicioMensaje} <b>{message.From.FirstName} {message.From.LastName}</b>";
+                        return Task.CompletedTask;
+                    }
+
+                    static async Task SendInfoUser(Message message)
+                    {
+                        try
+                        {
                             await Bot.SendTextMessageAsync(
-                                chatId: message.Chat.Id,
-                                text: mensajeBase,
+                                message.Chat.Id,
+                                $"Id chat:{message.Chat.Id} - IdUsuario: <b>{message.From.Id}</b> " +
+                                $"Nombre Usuario: {message.From.FirstName} {message.From.LastName}" +
+                                $"UsuarioTelegram: {message.From.Username}",
                                 parseMode: ParseMode.Html,
                                 replyMarkup: new ReplyKeyboardRemove()
                             );
                         }
-
-                        static Task SendStatusdUser(Message message, bool pTipo = true)
+                        catch (Exception ex)
                         {
-                            var inicioMensaje = DateTime.Now.Hour switch
-                            {
-                                >= 0 and < 12 => pTipo ? "Hola buen dia" : "Buen dia, hasta Luego",
-                                > 12 and <= 18 => pTipo ? "Hola buenas tardes" : "Buenas tardes, hasta Luego",
-                                > 18 and < 23 => pTipo ? "Hola buenas noches" : "Buenas noches, hasta Luego",
-                                _ => string.Empty
-                            };
-
-                            var mensajeBase = $"{inicioMensaje} <b>{message.From.FirstName} {message.From.LastName}</b>";
-                            return Task.CompletedTask;
+                            Log.Logger.Error($"Error {ex.Message}");
                         }
 
-
-                        static async Task RequestContactAndLocation(Message message)
-                        {
-                            var requestReplyKeyboard = new ReplyKeyboardMarkup(new[]
-                            {
-                            KeyboardButton.WithRequestLocation("Location"),
-                            KeyboardButton.WithRequestContact("Contact"),
-                        });
-                            await Bot.SendTextMessageAsync(
-                                chatId: message.Chat.Id,
-                                text: "Who or Where are you?",
-                                replyMarkup: requestReplyKeyboard
-                            );
-                        }
-
-                        static async Task SendInfoUser(Message message)
-                        {
-                            try
-                            {
-                                await Bot.SendTextMessageAsync(
-                                    message.Chat.Id,
-                                    $"Id chat:{message.Chat.Id} - IdUsuario: <b>{message.From.Id}</b> " +
-                                    $"Nombre Usuario: {message.From.FirstName} {message.From.LastName}" +
-                                    $"UsuarioTelegram: {message.From.Username}",
-                                    parseMode: ParseMode.Html,
-                                    replyMarkup: new ReplyKeyboardRemove()
-                                );
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Logger.Error($"Error {ex.Message}");
-                            }
-
-                        }
+                    }
 
                  
 
-                        static async Task UpdateRecordVehicle(Message message)
+                    static async Task UpdateRecordVehicle(Message message)
+                    {
+                        var inicioMensaje = DateTime.Now.Hour switch
                         {
-                            var inicioMensaje = DateTime.Now.Hour switch
-                            {
-                                >= 0 and < 12 => "Hola buen dia",
-                                >= 12 and <= 18 => "Hola buenas tardes",
-                                > 18 and <= 23 => "Hola buenas noches",
-                                _ => string.Empty
-                            };
+                            >= 0 and < 12 => "Hola buen dia",
+                            >= 12 and <= 18 => "Hola buenas tardes",
+                            > 18 and <= 23 => "Hola buenas noches",
+                            _ => string.Empty
+                        };
                             
-                            var mensajeBase = $"{inicioMensaje}, <b>{message.From.FirstName} {message.From.LastName}</b>";
-                            _serilogLogger.Information(message.Text);
-                            var mensajeTelegram = message.Text.ToLower().Replace("/registro ", "").ToLower().Split(' ');
-                            await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
-                            await Task.Delay(500);
-                            if (mensajeTelegram.Length != 2)
-                            {
-                                var mensaje =
-                                    $"{mensajeBase} escribe bien los parametros\nEjemplo: <b>/registro placa KM (ultimo) </b>";
-                                await Bot.SendTextMessageAsync(
-                                    message.Chat.Id,
-                                    mensaje,
-                                    parseMode: ParseMode.Html,
-                                    replyMarkup: new ReplyKeyboardRemove()
-                                );
-
-                            }
-                            else
-                            {
-                                var placa = mensajeTelegram[0];
-                                var km = Convert.ToInt64(mensajeTelegram[1]);
-                                var consulta = _serviceProvider.GetService<ConsultaCliente>();
-                                if (consulta != null)
-                                {
-                                    var mensaje = await consulta.RegistroActividadAsync(placa,km, message.From.Id);
-                                    await Bot.SendTextMessageAsync(
-                                        chatId: message.Chat.Id,
-                                        text: mensaje,
-                                        parseMode: ParseMode.Html,
-                                        replyMarkup: new ReplyKeyboardRemove()
-                                    );
-                                }
-                            }
-                        }
-
-                        static async Task SendHelpGroup(Message message)
+                        var mensajeBase = $"{inicioMensaje}, <b>{message.From.FirstName} {message.From.LastName}</b>";
+                        _serilogLogger.Information(message.Text);
+                        var mensajeTelegram = message.Text.ToLower().Replace("/registro ", "").ToLower().Split(' ');
+                        await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                        await Task.Delay(500);
+                        if (mensajeTelegram.Length != 2)
                         {
-                            const string usage = "Lista de Comandos:\n" +
-                                                 "<b>/helpGroup</b>   - Listado de Comandos\n" +
-                                                 "<b>/infoUser</b> - Informacion del Usuario\n" +
-                                                 "<b>/registro</b> - Registro de Km del vehiculo\n" +
-                                                 "<b>/UpdateUser</b>  - Actualizar Usuario\n"
-                                ;
+                            var mensaje =
+                                $"{mensajeBase} escribe bien los parametros\nEjemplo: <b>/registro placa KM (ultimo) </b>";
                             await Bot.SendTextMessageAsync(
-                                chatId: message.Chat.Id,
-                                text: usage,
+                                message.Chat.Id,
+                                mensaje,
                                 parseMode: ParseMode.Html,
                                 replyMarkup: new ReplyKeyboardRemove()
                             );
+
                         }
+                        else
+                        {
+                            var placa = mensajeTelegram[0];
+                            var km = Convert.ToInt64(mensajeTelegram[1]);
+                            var consulta = _serviceProvider.GetService<ConsultaCliente>();
+                            if (consulta != null)
+                            {
+                                var mensaje = await consulta.RegistroActividadAsync(placa, km, message.From.Id);
+                                if (!mensaje.Item1)
+                                {
+                                    await Bot.SendTextMessageAsync(
+                                        chatId: message.Chat.Id,
+                                        text: mensaje.Item2,
+                                        replyMarkup: new ReplyKeyboardRemove()
+                                    );
+                                }
+                                else
+                                {
+                                    var requestReplyKeyboard = new ReplyKeyboardMarkup(new[]
+                                    {
+                                        KeyboardButton.WithRequestLocation(@"Enviar Ubicacion para registro")
+                                    }, true);
+                                    await Bot.SendTextMessageAsync(
+                                        chatId: message.Chat.Id,
+                                        text: "Enviar Ubicacion",
+                                        replyMarkup: requestReplyKeyboard
+                                    );
+                                }
+                               
+                            }
+                        }
+                    }
+
+                    static async Task UpdateLocationVehicle(Message message)
+                    {
+                          
+                        var consulta = _serviceProvider.GetService<ConsultaCliente>();
+                        if (consulta != null)
+                        {
+                          var mensaje= await consulta.RegistroUbicacionAsync(message);
+                           await Bot.SendTextMessageAsync(
+                               chatId: message.Chat.Id,
+                               text: mensaje,
+                               parseMode: ParseMode.Html,
+                               replyMarkup: new ReplyKeyboardRemove()
+                           );
+                        }
+                        
+                    }
+
+                    static async Task SendHelpGroup(Message message)
+                    {
+                        const string usage = "Lista de Comandos:\n" +
+                                             "<b>/helpGroup</b>   - Listado de Comandos\n" +
+                                             "<b>/infoUser</b> - Informacion del Usuario\n" +
+                                             "<b>/registro</b> - Registro de Km del vehiculo\n" +
+                                             "<b>/UpdateUser</b>  - Actualizar Usuario\n"
+                            ;
+                        await Bot.SendTextMessageAsync(
+                            chatId: message.Chat.Id,
+                            text: usage,
+                            parseMode: ParseMode.Html,
+                            replyMarkup: new ReplyKeyboardRemove()
+                        );
+                    }
 
                       
 
-                        static async Task Usage(Message message)
-                        {
-                            const string usage = "Lista de Comandos:\n" +
-                                                 "/helpGroup   - Comandos de Ayuda\n" +
-                                                 "/infoGroup - Informacion del Grupo\n" +
-                                                 "/photo    - send a photo\n" +
-                                                 "/request  - request location or contact";
-                        }
+                    static async Task Usage(Message message)
+                    {
+                        const string usage = "Lista de Comandos:\n" +
+                                             "/helpGroup   - Comandos de Ayuda\n" +
+                                             "/infoGroup - Informacion del Grupo\n" +
+                                             "/photo    - send a photo\n" +
+                                             "/request  - request location or contact";
+                    }
 
-                        #endregion
+                    #endregion
 
-                        break;
+                    break;
                     }
             }
         }

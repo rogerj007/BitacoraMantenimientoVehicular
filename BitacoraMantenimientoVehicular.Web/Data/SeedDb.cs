@@ -36,10 +36,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 await CheckComponetsAsync().ConfigureAwait(false);
                 await CheckColorAsync().ConfigureAwait(false);
                 await CheckFuelAsync().ConfigureAwait(false);
-                await CheckUserTypeAsync().ConfigureAwait(false);
                 await CheckVehiculeBrandAsync().ConfigureAwait(false); 
-                await CheckVehiculeTaskAsync().ConfigureAwait(false);
-             
                 await CheckVehiculeStatusAsync().ConfigureAwait(false);
                 //Create Events
                  await CheckVehicleAsync().ConfigureAwait(false);
@@ -66,11 +63,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
 
         private async Task CheckUsersAsync()
         {
-            await CheckUserAsync("1010", "Admin", "Web", "demo@yopmail.com", "0998775584", "Calle Luna Calle Venus", true);
-            await CheckUserAsync("1020", "Roger", "Jaimes", "rogerjh@yopmail.net", "0998580084", "Calle Luna Calle Tierra",   true);
-            await CheckUserAsync("1030", "Oswaldo", "Aguinaga", "oswaldoa@yopmail.net", "0998585114", "Calle Luna Calle Marte", true);
-            await CheckUserAsync("2020", "Cristian", "Rosado", "cristianr@yopmail.com", "0998547584", "Calle Luna Calle Jupiter",  true);
-            await CheckUserAsync("3030", "Mauricio", "Torres", "mauriciot@yopmail.com", "0990505584", "Calle Luna Calle Pluton",  true);
+            await CheckUserAsync("1010", "Admin", "Web", "ajelonarvaez.m92@gmail.com", "00000000", "Calle Luna Calle Venus", true);
         }
 
         private async Task<UserEntity> CheckUserAsync(
@@ -143,35 +136,6 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             }
         }
 
-        private async Task CheckVehiculeTaskAsync()
-        {
-            try
-            {
-                if (!_dataContext.MaintenanceTask.Any())
-                {
-                    await _dataContext.MaintenanceTask.AddRangeAsync(
-                        new MaintenanceTaskEntity { Name = "CAMBIO TRAMPA DE AGUA", CreatedDate = DateTime.UtcNow, IsEnable = true, Km= (short)new Random().Next(100,500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 5000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE ACEITE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 5000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO ACEITE HIDRAULICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 2500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO DE AIRE SECUNDARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 1000) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO FILTRO COMBUSTIBLE PRIMARIO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE SEGURO DE PUERTAS", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(50, 500) },
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE ENCENDIDO DE MOTOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 1500) },
-                        new MaintenanceTaskEntity { Name = "CAMBIO BATERIA Y REVISION DE SISTEMA ELECTRICO", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(500, 700)},
-                        new MaintenanceTaskEntity { Name = "ARREGLO DE RADIADOR", CreatedDate = DateTime.UtcNow, IsEnable = true, Km = (short)new Random().Next(1000, 20500) }
-                    );
-                    await _dataContext.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-           
-        }
-
         private async Task CheckVehiculeStatusAsync()
         {
             try
@@ -213,7 +177,8 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                     await _dataContext.Vehicle.AddRangeAsync(
                         new VehicleEntity { Name = "PBX1234",
                                             Vin = "123456",
-                                            KmHrActual=2500,
+                                            KmRegistro=25500,
+                                            KmActual=25500,
                                             Cylinder = 1500,
                                             MotorSerial = "159XXXX",   
                                             Year=2021,
@@ -228,8 +193,9 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                         },
                         new VehicleEntity { Name = "GYE6547",
                                             Vin = "654321",
-                                            Cylinder = 1500,
-                                            KmHrActual=2750,
+                                            Cylinder = 30500,
+                                            KmRegistro = 2750,
+                                            KmActual=2750,
                                             MotorSerial="159EDFFF",
                                             Year=2011,
                                             CreatedDate = DateTime.UtcNow, 
@@ -328,24 +294,6 @@ namespace BitacoraMantenimientoVehicular.Web.Data
         }
        
 
-        private async Task CheckUserTypeAsync()
-        {
-            if (!_dataContext.UserFunction.Any())
-            {
-                await _dataContext.UserFunction.AddRangeAsync(
-                    new UserFunctionEntity { Name = "AYUDANTE DE VUCANIZADOR", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "VULCANIZADOR", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "ASISTENTE DE SUPERVISION MTTO. MECÁNICO", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "AYUDANTE DE MECÁNICA", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "MECÁNICO", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "AYUDANTE SOLDADOR", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "SOLDADOR", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "JEFE DE TALLERES", CreatedDate = DateTime.UtcNow },
-                    new UserFunctionEntity { Name = "SUPERVISOR DE MANTENIMIENTO MECÁNICO ", CreatedDate = DateTime.UtcNow }
-                );
-                await _dataContext.SaveChangesAsync();
-            }
-        }
         private async Task CheckFuelAsync()
         {
             if (!_dataContext.Fuel.Any())

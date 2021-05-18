@@ -50,6 +50,8 @@
             );
 
         columns.AddFor(m => m.Km);
+        columns.AddFor(m => m.Latitud);
+        columns.AddFor(m => m.Longitud);
         columns.AddFor(m => m.ClientId).EditorOptions(new { required = true })
             .Lookup(lookup => lookup
                 .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("ClientLookup").Key("Value"))

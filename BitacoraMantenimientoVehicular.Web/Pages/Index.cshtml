@@ -1,4 +1,16 @@
 @page
 
-<h2 class="content-block">Home</h2>
+@using DevExtreme.AspNet.Mvc
 
+@model BitacoraMantenimientoVehicular.Web.Pages.IndexModel
+<h2 class="content-block">Proceso primario de mantenimiento preventivo</h2>
+@(Html.DevExtreme().Gallery()
+    .ID("gallery")
+    .DataSource(Model.Images)
+    .StretchImages(true)
+    .Height(450)
+    .Loop(true)
+    .SlideshowDelay(4000)
+    .ShowNavButtons(true)
+    .ShowIndicator(true)
+    )

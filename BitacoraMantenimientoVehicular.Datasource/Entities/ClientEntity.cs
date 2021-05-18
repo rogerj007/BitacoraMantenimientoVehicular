@@ -74,5 +74,7 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [Required]
         public UserType UserType { get; set; }
 
+        public virtual ICollection<ClientEntityVehicleEntity> ClientEntityVehicleEntities { get; set; }
+
     }
 }

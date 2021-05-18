@@ -26,25 +26,29 @@
             .Title("Color Info")
             .ShowTitle(true)
             .Width(700)
-            .Height(225)
+            .Height(425)
             .Position(pos => pos
                 .My(HorizontalAlignment.Center, VerticalAlignment.Top)
                 .At(HorizontalAlignment.Center, VerticalAlignment.Top)
                 .Of(new JS("window"))
             )
         )
-        .Form(f => f.Items(items =>
-        {
-            items.AddGroup()
-                .ColCount(2)
-                .ColSpan(2)
-                .Items(groupItems =>
-                {
-                    groupItems.AddSimpleFor(m => m.Name)
-                        .ColSpan(2)
-                        .Editor(editor => editor.TextArea().Height(100));
-                });
-        }))
+    //.Form(f => f.Items(items =>
+    //{
+    //    items.AddGroup()
+    //        .Items(groupItems =>
+    //        {
+    //            groupItems.AddSimpleFor(m => m.Name)
+    //                .Editor(editor => editor.TextArea());
+    //            groupItems.AddSimpleFor(m => m.Code)
+    //                .Name("Code of Item");
+    //            groupItems.AddSimpleFor(m => m.Ttl)
+    //                .Name("Km de vida (TTL)");
+    //            groupItems.AddSimpleFor(m => m.IsEnable)
+    //                .Name("Km de vida (TTL)")
+    //                .Editor(editor => editor.Switch());
+    //        });
+    //}))
     )
     .RowAlternationEnabled(true)
     .ShowRowLines(true)
@@ -66,10 +70,10 @@
     .OnExporting("exporting")
     .Columns(columns => {
 
-        columns.AddFor(m => m.Id).AllowSearch(true).AllowEditing(false);
-        columns.AddFor(m => m.Name).AllowSearch(true);
-        columns.AddFor(m => m.Code).AllowSearch(true);
-        columns.AddFor(m => m.Ttl).AllowSearch(true);
+        columns.AddFor(m => m.Id).Visible(false).AllowEditing(false);
+        columns.AddFor(m => m.Name).AllowSearch(true).Caption("COMPONENT");
+        columns.AddFor(m => m.Code).AllowSearch(true).Caption("CODE");
+        columns.AddFor(m => m.Ttl).AllowSearch(true).Caption("CHANGE EVERY KM");
         columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
         columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
         columns.AddFor(m => m.IsEnable);

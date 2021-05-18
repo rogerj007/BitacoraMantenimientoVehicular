@@ -33,9 +33,6 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
 
         public bool IsEnable { get; set; }
 
-
-       
-
         [StringLength(25, MinimumLength = 4)]
         [MaxLength(25)]
         [Required]
@@ -54,8 +51,11 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [Range(1900, int.MaxValue, ErrorMessage = "Year must be from 2000")]
         public short Year { get; set; }
 
-        [Display(Name = "Km - Hr Actual")]
-        public long KmHrActual { get; set; }
+        [Display(Name = "Km Registro")]
+        public long KmRegistro { get; set; }
+
+        [Display(Name = "Km Actual")]
+        public long KmActual { get; set; }
 
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
@@ -68,6 +68,8 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public VehicleStatusEntity VehicleStatus { get; set; }
 
         public virtual ICollection<VehicleRecordActivityEntity> VehicleRecordActivities { get; set; }
+
+        public virtual ICollection<ClientEntityVehicleEntity> ClientEntityVehicleEntities { get; set; }
 
     }
 }

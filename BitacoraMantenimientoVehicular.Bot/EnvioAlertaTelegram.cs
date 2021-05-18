@@ -18,13 +18,13 @@ namespace BitacoraMantenimientoVehicular.Bot
     {
         private readonly IConfigurationRoot _config;
         private readonly ILogger<EnvioAlertaTelegram> _logger;
-        private readonly IDbContextFactory<DataContext> _dataContext;
+        private readonly IDbContextFactory<DataContext> _context;
         public EnvioAlertaTelegram(IConfigurationRoot config, ILogger<EnvioAlertaTelegram> loggerFactor,
             IDbContextFactory<DataContext> dataContext)
         {
             _config = config;
             _logger = loggerFactor;
-            _dataContext = dataContext;
+            _context = dataContext;
         }
         public async Task Run()
         {
@@ -36,22 +36,28 @@ namespace BitacoraMantenimientoVehicular.Bot
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     _logger.LogInformation("Consulta a Base para Envio Telegram");
                     Console.ResetColor();
-                    var fechaConsulta = DateTime.Today.AddDays(0);
-                    
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                  //  _logger.LogInformation($"Reportajes a notificar: {reportajes.Count} por Telegram");
-                    Console.ResetColor();
+                    await using var context = _context.CreateDbContext();
+                    var componentesNc = await context.ComponentNextChange.Where(c=>!c.IsComplete).AsNoTracking().ToListAsync(cancellationToken.Token);
+
+                    foreach (var vehicle in componentesNc.Select(o => o.Vehicle).Distinct())
+                    {
+                        foreach (var componente in componentesNc.Where(c=>c.Vehicle==vehicle))
+                        {
+
+                        }
+                    }
+                   
 
 
-                 
+
 
                     var proxEnvio = 15;
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
 
-                    Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxEnvio} seg");
+                    Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxEnvio} min");
                     Console.ResetColor();
                     Console.WriteLine(Environment.NewLine);
-                    await Task.Delay(TimeSpan.FromSeconds(proxEnvio), cancellationToken.Token);
+                    await Task.Delay(TimeSpan.FromMinutes(proxEnvio), cancellationToken.Token);
                 }
                 catch (Exception ex)
                 {

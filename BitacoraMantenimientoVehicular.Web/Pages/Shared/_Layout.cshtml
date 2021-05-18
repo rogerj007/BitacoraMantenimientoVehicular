@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Vehicle Maintenance Web</title>
+    <title>Cooperativa de Transportes Espejo</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
     @* Uncomment to use the HtmlEditor control *@
@@ -69,7 +69,7 @@
                         .Location(ToolbarItemLocation.Before)
                         .CssClass("menu-button");
                     items.Add()
-                        .Html("<div>Vehicle Maintenance Web</div>")
+                        .Html("<div>Cooperativa de Transportes Espejo</div>")
                         .Location(ToolbarItemLocation.Before)
                         .CssClass("header-title");
                 })
@@ -180,11 +180,6 @@
                                 .Icon("columnchooser")
                                 .Option("path", GetUrl("Vehicle/VehicleBrand/Index"))
                                 .Selected(IsCurrentUrl("Vehicle/VehicleBrand/Index"));
-                            subItems.Add()
-                                .Text("Maintenance Task")
-                                .Icon("fieldchooser")
-                                .Option("path", GetUrl("Vehicle/MaintenanceTask/Index"))
-                                .Selected(IsCurrentUrl("Vehicle/MaintenanceTask/Index"));
                             subItems.Add()
                                 .Text("Status Vehicle")
                                 .Icon("product")
@@ -394,7 +389,7 @@
         }];
 
         function menuItem_click(e) {
-            var item = e.itemData;
+            const item = e.itemData;
             if (item.key === "changepassword") {
                 window.location = '/Account/User/ChangePassword';
             }

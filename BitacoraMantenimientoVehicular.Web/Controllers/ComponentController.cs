@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Entities;
@@ -37,7 +38,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
             model.CreatedDate = DateTime.UtcNow;
-            var result = _context.Component.Add(model);
+            var result = await _context.Component.AddAsync(model);
             await _context.SaveChangesAsync();
 
             return Json(new { result.Entity.Id });
@@ -69,43 +70,37 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
 
 
         private void PopulateModel(ComponentEntity model, IDictionary values) {
-            string COLOR_ID = nameof(ComponentEntity.Id);
-            string NAME = nameof(ComponentEntity.Name);
-            string CODE = nameof(ComponentEntity.Code);
-            string TTL = nameof(ComponentEntity.Ttl);
-            
-            string IS_ENABLE = nameof(ComponentEntity.IsEnable);
+            const string colorId = nameof(ComponentEntity.Id);
+            const string name = nameof(ComponentEntity.Name);
+            const string code = nameof(ComponentEntity.Code);
+            const string ttl = nameof(ComponentEntity.Ttl);
+            const string isEnable = nameof(ComponentEntity.IsEnable);
 
-            if(values.Contains(COLOR_ID)) {
-                model.Id = Convert.ToInt16(values[COLOR_ID]);
+            if(values.Contains(colorId)) {
+                model.Id = Convert.ToInt16(values[colorId]);
             }
 
-            if(values.Contains(NAME)) {
-                model.Name = Convert.ToString(values[NAME]).ToUpper();
+            if(values.Contains(name)) {
+                model.Name = Convert.ToString(values[name])?.ToUpper();
             }
 
-            if(values.Contains(CODE)) {
-                model.Code = Convert.ToString(values[CODE]).ToUpper();
+            if(values.Contains(code)) {
+                model.Code = Convert.ToString(values[code])?.ToUpper();
             }
 
-            if(values.Contains(TTL)) {
-                model.Ttl = Convert.ToInt16(values[TTL]);
+            if(values.Contains(ttl)) {
+                model.Ttl = Convert.ToInt16(values[ttl]);
             }
 
-            if(values.Contains(IS_ENABLE)) {
-                model.IsEnable = Convert.ToBoolean(values[IS_ENABLE]);
+            if(values.Contains(isEnable)) {
+                model.IsEnable = Convert.ToBoolean(values[isEnable]);
             }
         }
 
         private string GetFullErrorMessage(ModelStateDictionary modelState) {
-            var messages = new List<string>();
+            var messages = (from entry in modelState from error in entry.Value.Errors select error.ErrorMessage).ToList();
 
-            foreach(var entry in modelState) {
-                foreach(var error in entry.Value.Errors)
-                    messages.Add(error.ErrorMessage);
-            }
-
-            return String.Join(" ", messages);
+            return string.Join(" ", messages);
         }
     }
 }
