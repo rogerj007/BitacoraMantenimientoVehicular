@@ -55,6 +55,10 @@ namespace BitacoraMantenimientoVehicular.Datasource
             builder.Entity<VehicleStatusEntity>()
                 .Property(b => b.CreatedDate)
                 .HasDefaultValueSql("getutcdate()");
+
+            builder.Entity<UserEntity>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
         }
 
         public DbSet<ClientEntity> Client { get; set; }

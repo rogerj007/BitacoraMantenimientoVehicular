@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BitacoraMantenimientoVehicular.Datasource.Entities
 {
@@ -24,12 +20,12 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public DateTime? ModifiedDate { get; set; }
         public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
         public UserEntity CreatedBy { get; set; }
-        public UserEntity ModifiedBy { get; set; }
+        public UserEntity? ModifiedBy { get; set; }
 
         public bool IsEnable { get; set; }
 
-        public virtual ClientEntity ClientEntity { get; set; }
+        public ClientEntity ClientEntity { get; set; }
 
-        public virtual VehicleEntity VehicleEntity { get; set; }
+        public VehicleEntity VehicleEntity { get; set; }
     }
 }

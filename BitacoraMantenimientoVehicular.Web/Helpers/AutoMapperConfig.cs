@@ -11,6 +11,7 @@ namespace BitacoraMantenimientoVehicular.Web.Helpers
 
             CreateMap<VehicleEntity, VehicleViewModel>().ReverseMap();
             CreateMap<UserEntity, UserViewModel>().ReverseMap();
+            CreateMap<ClientEntityVehicleEntity, ClientEntityVehicleViewModel>().ReverseMap();
             //.ForMember(dest => dest.VehicleBrandId,
             //    opt => opt.MapFrom(src => src.VehicleBrand.Id))
             //.ForMember(dest => dest.ColorId,

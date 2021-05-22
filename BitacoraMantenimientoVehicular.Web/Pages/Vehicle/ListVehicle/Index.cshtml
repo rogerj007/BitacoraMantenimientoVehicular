@@ -64,7 +64,7 @@
     )
     .Grouping(grouping => grouping.AutoExpandAll(true))
     .GroupPanel(groupPanel => groupPanel.Visible(true))
-    .Height(500)
+    .Height(600)
     .HeaderFilter(h => h.Visible(true))
     .FocusedRowEnabled(true)
     .FocusedRowIndex(0)
@@ -138,63 +138,64 @@
                             md.Enabled(true);
                             md.Template(@<text>
                                             @(Html.DevExtreme().DataGrid<ClientEntityVehicleViewModel>()
-                                                    .ColumnAutoWidth(true)
-                                                    .ShowBorders(true)
-                                                    .Columns(columns => {
-                                                        columns.AddFor(m => m.ClientId).EditorOptions(new { required = true })
-                                                            .Lookup(lookup => lookup
-                                                                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("ClientLookup").Key("Value"))
-                                                                .ValueExpr("Value")
-                                                                .DisplayExpr("Text")
-                                                            );
-                                                        columns.AddFor(m => m.VehicleId).EditorOptions(new { required = true })
-                                                            .Lookup(lookup => lookup
-                                                                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("VehicleLookup").Key("Value"))
-                                                                .ValueExpr("Value")
-                                                                .DisplayExpr("Text")
-                                                            );
-                                                        columns.AddFor(m => m.IsEnable).Caption("Enable").DataType(GridColumnDataType.Boolean);
-                                                        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
-                                                        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+                                                .ColumnAutoWidth(true)
+                                                .OnInitNewRow($"function(e) {{ onInitNewRow(e, {new JS("data.Id")}); }}")
+                                                .ShowBorders(true)
+                                                .Columns(columns => {
+                                                                        columns.AddFor(m => m.ClientId).EditorOptions(new { required = true })
+                                                                            .Lookup(lookup => lookup
+                                                                                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("ClientLookup").Key("Value"))
+                                                                                .ValueExpr("Value")
+                                                                                .DisplayExpr("Text")
+                                                                            );
+                                                                        columns.AddFor(m => m.VehicleId).EditorOptions(new { required = true })
+                                                                            .Lookup(lookup => lookup
+                                                                                .DataSource(d => d.Mvc().Controller("Vehicle").LoadAction("VehicleLookup").Key("Value"))
+                                                                                .ValueExpr("Value")
+                                                                                .DisplayExpr("Text")
+                                                                            );
+                                                                        columns.AddFor(m => m.IsEnable).Caption("Enable").DataType(GridColumnDataType.Boolean);
+                                                                        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+                                                                        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
 
-                                                    })
-                                                    .DataSource(d => d.Mvc()
-                                                        .Controller("Vehicle")
-                                                        .LoadAction("GetDetailsClients")
-                                                        .InsertAction("PostDetailsClients")
-                                                        //  .UpdateAction("PutDetailsClients")
-                                                        .Key("Id")
-                                                        .LoadParams(new { id = new JS("data.ID") })
-                                                    )
-                                                    .Editing(c => c
-                                                        .AllowUpdating(true)
-                                                        .AllowDeleting(true)
-                                                        .Texts(t => t.DeleteRow("Remove")
-                                                            .ConfirmDeleteMessage("Are you sure you want to remove this item?")
-                                                            .ConfirmDeleteTitle("Remove Item"))
-                                                        .AllowAdding(true)
-                                                        .Mode(GridEditMode.Popup)
-                                                        .RefreshMode(GridEditRefreshMode.Reshape)
-                                                        .Popup(e => e
-                                                            .Title("Clients Info")
-                                                            .ShowTitle(true)
-                                                            .Width(700)
-                                                            .Height(545)
-                                                        )
-                                                        .Form(f => f.Items(items => {
-                                                                                        items.AddGroup()
-                                                                                            .ColCount(2)
-                                                                                            .ColSpan(2)
-                                                                                            .Items(groupItems => {
-                                                                                                                     groupItems.AddSimpleFor(m => m.ClientId).IsRequired(true);
-                                                                                                                     groupItems.AddSimpleFor(m => m.VehicleId).IsRequired(true);
-                                                                                                                     groupItems.AddSimpleFor(m => m.IsEnable).IsRequired(true);
-
-                                                                                            });
-                                                        }))
-                                                    )
+                                                })
+                                                .DataSource(d => d.Mvc()
+                                                    .Controller("Vehicle")
+                                                    .LoadAction("GetDetailsClients")
+                                                    .InsertAction("PostDetailsClients")
+                                                    .UpdateAction("PutDetailsClients")
+                                                    .DeleteAction("PutDetailsClients")
+                                                    .Key("Id")
+                                                    .LoadParams(new { id = new JS("data.Id") })
+                                                    
                                                 )
-                                         </text>);
+                                                .Editing(c => c
+                                                    .AllowUpdating(true)
+                                                    .AllowDeleting(true)
+                                                    .Texts(t => t.DeleteRow("Remove")
+                                                        .ConfirmDeleteMessage("Are you sure you want to remove this item?")
+                                                        .ConfirmDeleteTitle("Remove Item"))
+                                                    .AllowAdding(true)
+                                                    .Mode(GridEditMode.Popup)
+                                                    .RefreshMode(GridEditRefreshMode.Full)
+                                                    .Popup(e => e
+                                                        .Title("Clients Info")
+                                                        .ShowTitle(true)
+                                                        .Width(700)
+                                                        .Height(445)
+                                                    )
+                                                    .Form(f => f.Items(items => {
+                                                                                    items.AddGroup()
+                                                                                        .ColCount(2)
+                                                                                        .ColSpan(2)
+                                                                                        .Items(groupItems => {
+                                                                                                     groupItems.AddSimpleFor(m => m.ClientId).IsRequired(true);
+                                                                                                     groupItems.AddSimpleFor(m => m.IsEnable).Editor(r => r.Switch()).IsRequired(true);
+
+                                                                                        });
+                                                    }))
+                                                ))
+                                        </text>);
     })
     .Summary(s => s
         .TotalItems(totalItems => {
@@ -205,6 +206,11 @@
 
 
 <script>
+    function onInitNewRow(e, parentId) {
+       // alert(parentId);
+        e.data.VehicleId = parentId;
+    }
+
     function exporting(e) {
         var workbook = new window.ExcelJS.Workbook();
         var worksheet = workbook.addWorksheet('Vehicle');

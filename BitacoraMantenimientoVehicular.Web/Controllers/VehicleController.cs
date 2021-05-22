@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Entities;
+using BitacoraMantenimientoVehicular.Web.Helpers;
 using BitacoraMantenimientoVehicular.Web.Models;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Mvc;
@@ -22,10 +23,13 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserHelper _userHelper;
 
-        public VehicleController(DataContext context, IMapper mapper) {
+        public VehicleController(DataContext context, IMapper mapper, IUserHelper userHelper) 
+        {
             _context = context;
             _mapper = mapper;
+            _userHelper = userHelper;
         }
 
         [HttpGet]
@@ -177,21 +181,40 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> PostDetailsClients(string values)
+        public async Task<IActionResult> PostDetailsClients(Guid id, string values)
         {
             try
             {
-                var model = new ClientEntityVehicleViewModel();
-                var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
-                await PopulateModel(model, valuesDict);
-                model.CreatedDate = DateTime.UtcNow;
-                var user = await _context.Users.FirstAsync(u => u.UserName.Equals(User.Identity.Name));
-                model.CreatedBy = user;
-                var vehicle = _mapper.Map<ClientEntityVehicleEntity>(model);
-                var result = _context.Add(vehicle);
-                await _context.SaveChangesAsync();
-                return Json(new { result.Entity.Id });
+             
+                if (User.Identity != null)
+                {
+                    var user = await _userHelper.GetUserAsync(User.Identity.Name);
+                    var model = new ClientEntityVehicleViewModel();
+                    var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
+                   // model.VehicleId = id;
+                    await PopulateModel(model, valuesDict);
+                    model.CreatedDate = DateTime.UtcNow;
+
+
+                    var clientEntityVehicleEntity = _mapper.Map<ClientEntityVehicleEntity>(model);
+                    clientEntityVehicleEntity.CreatedBy = user;
+                    clientEntityVehicleEntity.ModifiedBy = null;
+                    var result = await _context.ClientEntityVehicle.AddAsync(clientEntityVehicleEntity);
+                    await _context.SaveChangesAsync();
+                    return Json(new { result.Entity.Id });
+                }
             }
+            catch (DbUpdateException e)
+            {
+                if (e.InnerException != null) ModelState.AddModelError("DbUpdateException", e.InnerException.ToString());
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                }
+
+            }
+           
             catch (Exception e)
             {
                 ModelState.AddModelError("Message", e.Message);
@@ -206,6 +229,56 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             return BadRequest();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> PutDetailsClients(Guid key, string values)
+        {
+            try
+            {
+                var model = await _context.ClientEntityVehicle
+                                            .AsNoTracking()
+                                            .FirstOrDefaultAsync(item => item.Id == key);
+                var modelViewModel = _mapper.Map<ClientEntityVehicleViewModel>(model);
+
+                if (model == null)
+                    return StatusCode(409, "Object not found");
+                _context.Entry(model).State = EntityState.Detached;
+                var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
+                await PopulateModel(modelViewModel, valuesDict);
+                if (!TryValidateModel(model))
+                    return BadRequest(GetFullErrorMessage(ModelState));
+                model.ModifiedDate = DateTime.UtcNow;
+                model = _mapper.Map<ClientEntityVehicleEntity>(modelViewModel);
+                if (User.Identity != null)
+                {
+                    var user = await _userHelper.GetUserAsync(User.Identity.Name); /*_context.Users.FirstAsync(u => u.UserName.Equals(User.Identity.Name));*/
+                    model.ModifiedBy = user;
+                }
+                _context.Entry(model).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("Message", e.Message);
+                if (e.InnerException != null) ModelState.AddModelError("InnerException", e.InnerException.ToString());
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                }
+                return View("Error");
+            }
+
+
+        }
+
+        [HttpDelete]
+        public async Task PutDetailsClients(Guid key)
+        {
+            var model = await _context.ClientEntityVehicle.FirstOrDefaultAsync(item => item.Id == key);
+            _context.ClientEntityVehicle.Remove(model);
+            await _context.SaveChangesAsync();
+        }
 
         #endregion
 
@@ -406,7 +479,8 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                 const string isEnable = nameof(ClientEntityVehicleViewModel.IsEnable);
                 const string clientId = nameof(ClientEntityVehicleViewModel.ClientId);
                 const string vehicleId = nameof(ClientEntityVehicleViewModel.VehicleId);
-
+                const string createdById = nameof(ClientEntityVehicleViewModel.CreatedById);
+                const string modifiedById = nameof(ClientEntityVehicleViewModel.ModifiedById);
 
                 if (values.Contains(id))
                 {
@@ -428,6 +502,17 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                     model.VehicleEntity = await _context.Vehicle.FindAsync(model.VehicleId);
                 }
 
+                if (values.Contains(createdById))
+                {
+                    model.CreatedById = values[createdById].ToString();
+                    model.CreatedBy = await _userHelper.GetUserAsync(values[createdById].ToString());
+                }
+
+                if (values.Contains(modifiedById))
+                {
+                    model.ModifiedById = values[modifiedById].ToString();
+                    model.ModifiedBy = await _userHelper.GetUserAsync(values[modifiedById].ToString());
+                }
 
             }
             catch (Exception e)
