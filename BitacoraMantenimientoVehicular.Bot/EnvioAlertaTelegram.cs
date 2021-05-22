@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace BitacoraMantenimientoVehicular.Bot
 {
@@ -26,7 +27,7 @@ namespace BitacoraMantenimientoVehicular.Bot
             _logger = loggerFactor;
             _context = dataContext;
         }
-        public async Task Run()
+        public async Task EnvioRegistro()
         {
             var cancellationToken = new CancellationTokenSource();
             while (!cancellationToken.IsCancellationRequested)
@@ -37,21 +38,51 @@ namespace BitacoraMantenimientoVehicular.Bot
                     _logger.LogInformation("Consulta a Base para Envio Telegram");
                     Console.ResetColor();
                     await using var context = _context.CreateDbContext();
-                    var componentesNc = await context.ComponentNextChange.Where(c=>!c.IsComplete).AsNoTracking().ToListAsync(cancellationToken.Token);
 
-                    foreach (var vehicle in componentesNc.Select(o => o.Vehicle).Distinct())
+                    var notificaciones = await context.RecordNotifications.Include(v=>v.Vehicle)
+                                                                            .Include(c=>c.Client)
+                                                                            .Include(v=>v.VehicleRecordActivity)
+                                                                            .Where(r => !r.Telegram || !r.Mail).ToListAsync(cancellationToken.Token);
+                    foreach (var notificar in notificaciones)
                     {
-                        foreach (var componente in componentesNc.Where(c=>c.Vehicle==vehicle))
+                        var consulta = await context.RecordNotifications.SingleAsync(n=>n.Id.Equals(notificar.Id), cancellationToken: cancellationToken.Token);
+                        if (!notificar.Telegram)
                         {
-
+                            await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
+                            if (notificar.VehicleRecordActivity.Latitud != null && notificar.VehicleRecordActivity.Longitud != null)
+                                    await Program.Bot.SendVenueAsync(
+                                        notificar.Client.Telegram,
+                                   
+                                        (float) notificar.VehicleRecordActivity.Latitud,
+                                        (float) notificar.VehicleRecordActivity.Longitud,
+                                        title: $"Registro Vehiculo:{notificar.Vehicle.Name} Km: {notificar.VehicleRecordActivity.Km}",
+                                        address: "",
+                                        cancellationToken: cancellationToken.Token);
+                            consulta.Telegram = true;
                         }
+
+                        if (!notificar.Mail)
+                        {
+                            consulta.Mail = true;
+                        }
+
+                        await context.SaveChangesAsync(cancellationToken.Token);
                     }
+                    //var componentesNc = await context.ComponentNextChange.Where(c=>!c.IsComplete).AsNoTracking().ToListAsync(cancellationToken.Token);
+
+                    //foreach (var vehicle in componentesNc.Select(o => o.Vehicle).Distinct())
+                    //{
+                    //    foreach (var componente in componentesNc.Where(c=>c.Vehicle==vehicle))
+                    //    {
+
+                    //    }
+                    //}
                    
 
 
 
 
-                    var proxEnvio = 15;
+                    var proxEnvio = 1;
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
 
                     Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxEnvio} min");

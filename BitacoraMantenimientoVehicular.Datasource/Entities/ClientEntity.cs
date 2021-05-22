@@ -10,7 +10,7 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
     public class ClientEntity
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public short Id { get; set; }
 
         [Display(Name = "Name")]

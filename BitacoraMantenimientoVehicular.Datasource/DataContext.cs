@@ -1,4 +1,5 @@
-﻿using BitacoraMantenimientoVehicular.Datasource.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using BitacoraMantenimientoVehicular.Datasource.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace BitacoraMantenimientoVehicular.Datasource
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+            
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -59,6 +61,15 @@ namespace BitacoraMantenimientoVehicular.Datasource
             builder.Entity<UserEntity>()
                 .Property(e => e.Id)
                 .ValueGeneratedOnAdd();
+
+
+            builder.Entity<RecordNotificationEntity>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<RecordNotificationEntity>()
+                .Property(b => b.CreatedDate)
+                .HasDefaultValueSql("getutcdate()");
         }
 
         public DbSet<ClientEntity> Client { get; set; }
@@ -71,9 +82,13 @@ namespace BitacoraMantenimientoVehicular.Datasource
         public DbSet<VehicleStatusEntity> VehicleStatus { get; set; }
         public DbSet<ComponentEntity> Component { get; set; }
 
+        public DbSet<VehicleRecordActivityEntity> VehicleRecordActivity { get; set; }
+
+        public DbSet<RecordNotificationEntity> RecordNotifications { get; set; }
+
         public DbSet<ComponentNextChangeEntity> ComponentNextChange { get; set; }
 
-        public DbSet<VehicleRecordActivityEntity> VehicleRecordActivities { get; set; }
+      
 
         public DbSet<ClientEntityVehicleEntity> ClientEntityVehicle { get; set; }
     }

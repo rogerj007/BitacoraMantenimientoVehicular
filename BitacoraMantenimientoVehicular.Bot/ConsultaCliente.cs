@@ -41,7 +41,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                 if (vehiculo == null)
                     return (false, $"La placa del vehiculo {pPlaque} no existe");
 
-                var validar = await context.VehicleRecordActivities.Where(r => r.Km >= pKm).ToListAsync();
+                var validar = await context.VehicleRecordActivity.Where(r => r.Km >= pKm).ToListAsync();
                 if (validar.Count > 0)
                 {
                     return (false, "No puede ingresar un Km menor al antes registrado");
@@ -83,7 +83,7 @@ namespace BitacoraMantenimientoVehicular.Bot
             {
                 await using var context = _context.CreateDbContext();
                 var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
-                var existeRegistro = await context.VehicleRecordActivities.Include(v => v.Vehicle).SingleOrDefaultAsync(r => r.RegisterBy.Id.Equals(usuario.Id) &&  (r.Latitud == null || r.Longitud==null));
+                var existeRegistro = await context.VehicleRecordActivity.Include(v => v.Vehicle).SingleOrDefaultAsync(r => r.RegisterBy.Id.Equals(usuario.Id) &&  (r.Latitud == null || r.Longitud==null));
                 string mensaje;
                 if (existeRegistro == null)
                     mensaje =
@@ -93,6 +93,8 @@ namespace BitacoraMantenimientoVehicular.Bot
                     existeRegistro.Latitud = (decimal?)message.Location.Latitude;
                     existeRegistro.Longitud = (decimal?)message.Location.Longitude;
                     await context.SaveChangesAsync();
+                    await NotificarClientesAsync( existeRegistro);
+
                     mensaje = $"Estimado el registro de la placa {existeRegistro.Vehicle.Name.ToUpper()} fue asignado correctamente registrado\n";
                 }
               
@@ -113,6 +115,45 @@ namespace BitacoraMantenimientoVehicular.Bot
             }
 
         }
+
+        public async Task NotificarClientesAsync(VehicleRecordActivityEntity record)
+        {
+            try
+            {
+                await using var context = _context.CreateDbContext();
+                var clients = await context.ClientEntityVehicle
+                                .Where(u => u.VehicleEntity.Id == record.Vehicle.Id)
+                                .Select(x=>x.ClientEntity).AsNoTracking().ToListAsync();;
+
+                foreach (var client in clients)
+                {
+
+                    var clientdb = await context.Client.AsNoTracking().SingleAsync(u => u.Id.Equals(client.Id));
+                    var registroNotificacion = new RecordNotificationEntity
+                                            {    Client = clientdb,
+                                                VehicleRecordActivity = record, 
+                                                Vehicle = record.Vehicle,
+                                                CreatedDate = DateTime.UtcNow
+                                            };
+                    var entry = context.Entry(registroNotificacion);
+                    entry.State = EntityState.Added;
+                    //context.Attach(registroNotificacion);
+                   // await context.AddAsync(registroNotificacion);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+            }
+           
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+            }
+
+        }
+
 
         public async Task<string> ValidarMantenimiento(VehicleEntity vehicle,long pKmAnterior, long pKm)
         {

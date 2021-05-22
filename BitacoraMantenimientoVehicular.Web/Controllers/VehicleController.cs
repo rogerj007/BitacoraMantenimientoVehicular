@@ -62,7 +62,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActivity(DataSourceLoadOptions loadOptions)
         {
-            var model = _context.VehicleRecordActivities.AsNoTracking()
+            var model = _context.VehicleRecordActivity.AsNoTracking()
                 .Select(v => new VehicleRecordActivityViewModel
                 {
                     Id = v.Id,

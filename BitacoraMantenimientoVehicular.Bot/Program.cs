@@ -101,9 +101,9 @@ namespace BitacoraMantenimientoVehicular.Bot
                 //Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
                
                 Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
-                //var envioAlertaTelegram = _serviceProvider.GetService<EnvioAlertaTelegram>();
-                //_serilogLogger.Information("Inicio de Envio Alertas Telegram.");
-                //envioAlertaTelegram?.Run();
+                var envioAlertaTelegram = _serviceProvider.GetService<EnvioAlertaTelegram>();
+                _serilogLogger.Information("Inicio de Envio Alertas Telegram.");
+                envioAlertaTelegram?.Run();
                 Console.Title = $"Start listening for Id:{me.Id} @{me.Username} CanJoinGroups:{me.CanJoinGroups}";
                 Console.ReadLine();
             }
@@ -140,9 +140,11 @@ namespace BitacoraMantenimientoVehicular.Bot
             //Add AddDbContext
             serviceCollection.AddDbContextFactory<DataContext>(options =>
             {
+                options.EnableSensitiveDataLogging(true);
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnectionV2"), providerOptions =>
                 {
                     providerOptions.EnableRetryOnFailure();
+                    
                     providerOptions.CommandTimeout(360);
                 });
             });
@@ -275,8 +277,6 @@ namespace BitacoraMantenimientoVehicular.Bot
 
                     }
 
-                 
-
                     static async Task UpdateRecordVehicle(Message message)
                     {
                         var inicioMensaje = DateTime.Now.Hour switch
@@ -341,6 +341,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                     {
                           
                         var consulta = _serviceProvider.GetService<ConsultaCliente>();
+
                         if (consulta != null)
                         {
                           var mensaje= await consulta.RegistroUbicacionAsync(message);
@@ -369,8 +370,6 @@ namespace BitacoraMantenimientoVehicular.Bot
                             replyMarkup: new ReplyKeyboardRemove()
                         );
                     }
-
-                      
 
                     static async Task Usage(Message message)
                     {
