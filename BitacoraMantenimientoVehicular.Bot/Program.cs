@@ -96,14 +96,12 @@ namespace BitacoraMantenimientoVehicular.Bot
 #endif
 
                 var me = await Bot.GetMeAsync(cts.Token);
-                // await Bot.ReceiveAsync(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
-                // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.//TODO:
-                //Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
                
                 Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
                 var envioAlertaTelegram = _serviceProvider.GetService<EnvioAlertaTelegram>();
                 _serilogLogger.Information("Inicio de Envio Alertas Telegram.");
-                envioAlertaTelegram?.Run();
+                envioAlertaTelegram?.EnvioRegistroKmActual();
+                envioAlertaTelegram?.EnvioComponenteCambiar();
                 Console.Title = $"Start listening for Id:{me.Id} @{me.Username} CanJoinGroups:{me.CanJoinGroups}";
                 Console.ReadLine();
             }

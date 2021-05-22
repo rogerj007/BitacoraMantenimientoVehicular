@@ -155,6 +155,45 @@ namespace BitacoraMantenimientoVehicular.Bot
         }
 
 
+        public async Task<string> RegistroCambioComponenteRealizadoAsync(Message message)
+        {
+            try
+            {
+                await using var context = _context.CreateDbContext();
+                var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
+                var existeRegistro = await context.VehicleRecordActivity.Include(v => v.Vehicle).SingleOrDefaultAsync(r => r.RegisterBy.Id.Equals(usuario.Id) && (r.Latitud == null || r.Longitud == null));
+                string mensaje;
+                if (existeRegistro == null)
+                    mensaje =
+                        $"No existe bitacora para actualizar, ejecute el registro de Km recorridos {message.From.FirstName} {message.From.LastName}";
+                else
+                {
+                    existeRegistro.Latitud = (decimal?)message.Location.Latitude;
+                    existeRegistro.Longitud = (decimal?)message.Location.Longitude;
+                    await context.SaveChangesAsync();
+                    await NotificarClientesAsync(existeRegistro);
+
+                    mensaje = $"Estimado el registro de la placa {existeRegistro.Vehicle.Name.ToUpper()} fue asignado correctamente registrado\n";
+                }
+
+
+                return mensaje;
+            }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return "Error en registro de ubicacion";
+
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return "Error en registro de ubicacion";
+
+            }
+
+        }
+
         public async Task<string> ValidarMantenimiento(VehicleEntity vehicle,long pKmAnterior, long pKm)
         {
             try
@@ -203,7 +242,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                     }
                 }
 
-                return recorridoUltimo > pKm ? mensajeNotificar.ToString() : string.Empty;
+                return recorridoUltimo > 0 ? mensajeNotificar.ToString() : string.Empty;
 
 
 

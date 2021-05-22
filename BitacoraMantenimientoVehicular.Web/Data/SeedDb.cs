@@ -231,12 +231,12 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                             CreatedDate = DateTime.UtcNow,
                             IsEnable = true,
                             Dni="1715150182",
-                            Mail="dnranjo@yopmail.com",
+                            Mail="rogerjh@mercapro.net",
                             CellPhone="0898575844",
                             Phone="0324562600",
                             Telegram= "135198016",
                             TelegramCode = "1234",
-                            Address="Cuenca-Ecuador",
+                            Address="Quito-Ecuador",
                             UserType=UserType.Owner
                         },
                         new ClientEntity
@@ -250,7 +250,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                             Phone = "0224162600",
                             Telegram = "0000000000",
                             TelegramCode="1234",
-                            Address = "Quito-Ecuador",
+                            Address = "Ibarra-Ecuador",
                             UserType = UserType.Driver
                         },
                         new ClientEntity
