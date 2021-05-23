@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using BitacoraMantenimientoVehicular.Bot.Helpers;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Entities;
+using DevExpress.XtraRichEdit;
+using DevExpress.XtraRichEdit.API.Native;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -57,12 +59,12 @@ namespace BitacoraMantenimientoVehicular.Bot
                 var actividad = new VehicleRecordActivityEntity {Vehicle = vehiculo, Km = pKm, CreatedDate=DateTime.UtcNow, RegisterBy=usuario};
                 context.Add(actividad);
                 await context.SaveChangesAsync();
-                var existeMantenimiento=await ValidarMantenimiento(vehiculo, kmTemp, pKm);
+                var existeMantenimiento=await ValidarMantenimiento(vehiculo, usuario, kmTemp, pKm);
                 var mensaje=new StringBuilder($"Estimado el registro de la placa {pPlaque.ToUpper()} fue asignado correctamente registrado\n");
                 if (!string.IsNullOrEmpty(existeMantenimiento))
                     mensaje.Append(existeMantenimiento);
 
-                return (true, mensaje.ToString());
+                return (true, existeMantenimiento);
             }
             catch (InvalidOperationException exception)
             {
@@ -73,6 +75,53 @@ namespace BitacoraMantenimientoVehicular.Bot
             {
                 _logger.LogError(exception.ToMessageAndCompleteStacktrace());
                 return (false, "Error en registrar actividad");
+            }
+
+        }
+
+        public async Task<string> MantenimientoEjecutadoAsync(string pPlaque)
+        {
+            try
+            {
+                await using var context = _context.CreateDbContext();
+              //  var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
+                var vehicle = await context.Vehicle.SingleOrDefaultAsync(v => v.Name.Equals(pPlaque));
+                if (vehicle == null)
+                {
+                    return "No existe vehiculo en el ";
+                }
+                var existeRegistro = await context.ComponentNextChange.Include(v => v.Vehicle).Where(v => v.Vehicle.Id.Equals(vehicle.Id)).ToListAsync();
+                                     //&& (r.Latitud == null || r.Longitud == null));
+                string mensaje;
+                if (existeRegistro == null)
+                    mensaje = $"No existe vehiculo para realizar mantenimiento";
+                else
+                {
+
+                    foreach (var registro in existeRegistro)
+                    {
+                        var db = await context.ComponentNextChange.SingleAsync(c=>c.Id.Equals(registro.Id));
+                        db.IsComplete = true;
+                        db.ModifiedDate = DateTime.UtcNow;
+                        await context.SaveChangesAsync();
+                    }
+                    mensaje = $"Estimado el mantenimiento fue correctamente registrado al vehiculo {pPlaque}\n";
+                }
+
+
+                return mensaje;
+            }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return "Error en registro de ubicacion";
+
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return "Error en registro de ubicacion";
+
             }
 
         }
@@ -194,7 +243,7 @@ namespace BitacoraMantenimientoVehicular.Bot
 
         }
 
-        public async Task<string> ValidarMantenimiento(VehicleEntity vehicle,long pKmAnterior, long pKm)
+        public async Task<string> ValidarMantenimiento(VehicleEntity vehicle, ClientEntity client,long pKmAnterior, long pKm)
         {
             try
             {
@@ -203,26 +252,28 @@ namespace BitacoraMantenimientoVehicular.Bot
                 await using var context = _context.CreateDbContext();
                 var componentes = await context.Component.AsNoTracking().ToListAsync();
                 var vehicleDb = await context.Vehicle.SingleAsync(v => v.Id == vehicle.Id);
-                var componentsNextChange = await context.ComponentNextChange.Include(v => v.Vehicle).Include(c=>c.Component)
+                var componentsNextChange = await context.ComponentNextChange.Include(v => v.Vehicle)
+                    .Include(c => c.Component)
                     .Where(v => vehicle != null && v.Vehicle.Id == vehicle.Id).ToListAsync();
-                var mensajeNotificar = new StringBuilder();
                 if (componentsNextChange.Any(nc => !nc.IsComplete))
                 {
-                  
+
                     mensaje.Append("Aun no completa el mantenimiento anterior\n");
                     foreach (var component in componentsNextChange)
                     {
                         mensaje.Append($"Componente :{component.Component.Name} debe ser remplazado\n");
                     }
+
                     return mensaje.ToString();
                 }
 
+               
                 foreach (var componente in componentes)
                 {
                     try
                     {
                         if (recorridoUltimo <= componente.Ttl) continue;
-                        var componetDb = await context.Component.SingleAsync(c=>c.Id.Equals(componente.Id));
+                        var componetDb = await context.Component.SingleAsync(c => c.Id.Equals(componente.Id));
                         var registroComponente = new ComponentNextChangeEntity
                         {
                             Vehicle = vehicleDb,
@@ -231,7 +282,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             Component = componetDb,
                             IsComplete = false
                         };
-
+                       
                         mensaje.Append($"Componente : {componente.Name} debe ser remplazado cada {componente.Ttl} Km\n");
                         await context.AddAsync(registroComponente);
                         await context.SaveChangesAsync();
@@ -241,36 +292,14 @@ namespace BitacoraMantenimientoVehicular.Bot
                         Console.WriteLine(e.ToMessageAndCompleteStacktrace());
                     }
                 }
-
-                return recorridoUltimo > 0 ? mensajeNotificar.ToString() : string.Empty;
-
-
-
-                ////Registro Inicial para vehiculos nuevos...
-                //foreach (var componente in componentes)
-                //{
-                //    if (vehicleDb.KmActual + componente.Ttl > pKm)
-                //    {
-                //        var registroComponente = new ComponentNextChangeEntity
-                //        {
-                //            Vehicle = vehicle,
-                //            CreatedDate = DateTime.UtcNow,
-                //            Km = pKm,
-                //            Component = componente,
-                //            IsComplete=false
-                //        };
-                //        await context.AddAsync(registroComponente);
-                //        await context.SaveChangesAsync();
-                //    }
-                //}
-
+              
+                return recorridoUltimo <= 0 ? string.Empty : mensaje.ToString();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return "Error en Validar Mantenimiento";
             }
-            return string.Empty;
         }
     }
 }

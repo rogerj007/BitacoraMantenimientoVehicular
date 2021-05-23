@@ -10,8 +10,9 @@ namespace BitacoraMantenimientoVehicular.Bot.Helpers
 {
     public static class MailExtension
     {
-        public static bool SendMail(this string html,string to, string subject )
+        public static bool SendMail(this string html,string to, string subject, string archivo= "" )
         {
+
             try
             {
 
@@ -38,6 +39,8 @@ namespace BitacoraMantenimientoVehicular.Bot.Helpers
                 mmMensaje.AlternateViews.Add(view);
                 mmMensaje.DeliveryNotificationOptions = DeliveryNotificationOptions.OnSuccess;
 
+                if(!string.IsNullOrEmpty(archivo))
+                    mmMensaje.Attachments.Add(new Attachment(archivo));
 
                 var scCliente = new SmtpClient
                 {

@@ -207,12 +207,11 @@ namespace BitacoraMantenimientoVehicular.Bot
                     var action = (message.Text.ToLower().Split(' ').First()) switch
                     {
                         "/start" => SendWelcomeMessages(message),
-                        "/online" => SendStatusdUser(message),
-                        "/offline" => SendStatusdUser(message, false),
-                        "/helpgroup" => SendHelpGroup(message),
+                        "/help" => SendHelp(message),
                         "/infouser" => SendInfoUser(message),
                         "/registro" => UpdateRecordVehicle(message),
-                      
+                        "/mantenimiento" => ExecuteVehicle(message),
+
                         _ => Usage(message)
                     };
                     await action;
@@ -240,21 +239,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             replyMarkup: new ReplyKeyboardRemove()
                         );
                     }
-
-                    static Task SendStatusdUser(Message message, bool pTipo = true)
-                    {
-                        var inicioMensaje = DateTime.Now.Hour switch
-                        {
-                            >= 0 and < 12 => pTipo ? "Hola buen dia" : "Buen dia, hasta Luego",
-                            > 12 and <= 18 => pTipo ? "Hola buenas tardes" : "Buenas tardes, hasta Luego",
-                            > 18 and < 23 => pTipo ? "Hola buenas noches" : "Buenas noches, hasta Luego",
-                            _ => string.Empty
-                        };
-
-                        var mensajeBase = $"{inicioMensaje} <b>{message.From.FirstName} {message.From.LastName}</b>";
-                        return Task.CompletedTask;
-                    }
-
+                  
                     static async Task SendInfoUser(Message message)
                     {
                         try
@@ -353,13 +338,57 @@ namespace BitacoraMantenimientoVehicular.Bot
                         
                     }
 
-                    static async Task SendHelpGroup(Message message)
+
+                    static async Task ExecuteVehicle(Message message)
+                    {
+                            var inicioMensaje = DateTime.Now.Hour switch
+                            {
+                                >= 0 and < 12 => "Hola buen dia",
+                                >= 12 and <= 18 => "Hola buenas tardes",
+                                > 18 and <= 23 => "Hola buenas noches",
+                                _ => string.Empty
+                            };
+
+                            var mensajeBase = $"{inicioMensaje}, <b>{message.From.FirstName} {message.From.LastName}</b>";
+                            _serilogLogger.Information(message.Text);
+                            var mensajeTelegram = message.Text.ToLower().Replace("/mantenimiento ", "").ToLower().Split(' ');
+                            await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                            await Task.Delay(500);
+                            if (mensajeTelegram.Length != 1)
+                            {
+                                var mensaje =
+                                    $"{mensajeBase} escribe bien los parametros\nEjemplo: <b>/Mantenimiento Placa</b>";
+                                await Bot.SendTextMessageAsync(
+                                    message.Chat.Id,
+                                    mensaje,
+                                    parseMode: ParseMode.Html,
+                                    replyMarkup: new ReplyKeyboardRemove()
+                                );
+
+                            }
+                            else
+                            {
+                                var placa = mensajeTelegram[0];
+                                var consulta = _serviceProvider.GetService<ConsultaCliente>();
+                                if (consulta != null)
+                                {
+                                    var mensaje = await consulta.MantenimientoEjecutadoAsync(placa);
+                                   await Bot.SendTextMessageAsync(
+                                            chatId: message.Chat.Id,
+                                            text: mensaje,
+                                            replyMarkup: new ReplyKeyboardRemove());
+                                }
+                            }
+                    }
+
+
+                    static async Task SendHelp(Message message)
                     {
                         const string usage = "Lista de Comandos:\n" +
-                                             "<b>/helpGroup</b>   - Listado de Comandos\n" +
+                                             "<b>/help</b>   - Listado de Comandos\n" +
                                              "<b>/infoUser</b> - Informacion del Usuario\n" +
-                                             "<b>/registro</b> - Registro de Km del vehiculo\n" +
-                                             "<b>/UpdateUser</b>  - Actualizar Usuario\n"
+                                             "<b>/Registro</b> - Registro de Km del vehiculo\n" +
+                                             "<b>/Mantenimiento</b>  - Mantenimiento realizado\n"
                             ;
                         await Bot.SendTextMessageAsync(
                             chatId: message.Chat.Id,
@@ -384,6 +413,8 @@ namespace BitacoraMantenimientoVehicular.Bot
                     }
             }
         }
+
+        
 
         private static async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
         {
