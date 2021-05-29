@@ -39,7 +39,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 await CheckVehiculeBrandAsync().ConfigureAwait(false); 
                 await CheckVehiculeStatusAsync().ConfigureAwait(false);
                 //Create Events
-                 await CheckVehicleAsync().ConfigureAwait(false);
+                // await CheckVehicleAsync().ConfigureAwait(false);
                  await CheckClientAsync().ConfigureAwait(false);
                 
             }
@@ -124,6 +124,8 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 await _dataContext.VehicleBrand.AddRangeAsync(
                     new VehicleBrandEntity { Name = "CHEVROLET", CreatedDate = DateTime.UtcNow, IsEnable = true },
                     new VehicleBrandEntity { Name = "KENWORTH", CreatedDate = DateTime.UtcNow, IsEnable = true },
+                    new VehicleBrandEntity { Name = "ZHONGTONG", CreatedDate = DateTime.UtcNow, IsEnable = true },
+                    new VehicleBrandEntity { Name = "SCANIA", CreatedDate = DateTime.UtcNow, IsEnable = true },
                     new VehicleBrandEntity { Name = "HINO MOTORS", CreatedDate = DateTime.UtcNow, IsEnable = true },
                     new VehicleBrandEntity { Name = "TOYOTA", CreatedDate = DateTime.UtcNow, IsEnable = true },
                     new VehicleBrandEntity { Name = "MAZDA", CreatedDate = DateTime.UtcNow, IsEnable = true },
@@ -238,49 +240,8 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                             TelegramCode = "1234",
                             Address="Quito-Ecuador",
                             UserType=UserType.Owner
-                        },
-                        new ClientEntity
-                        {
-                            Name = "CARLOS ESPINOZA",
-                            CreatedDate = DateTime.UtcNow,
-                            IsEnable = true,
-                            Dni = "98765432100",
-                            Mail = "cespinoza@yopmail.com",
-                            CellPhone = "0994575840",
-                            Phone = "0224162600",
-                            Telegram = "0000000000",
-                            TelegramCode="1234",
-                            Address = "Ibarra-Ecuador",
-                            UserType = UserType.Driver
-                        },
-                        new ClientEntity
-                        {
-                            Name = "MAURICIO ESPIN",
-                            CreatedDate = DateTime.UtcNow,
-                            IsEnable = true,
-                            Dni = "9875500",
-                            Mail = "mespin@yopmail.com",
-                            CellPhone = "0963575840",
-                            Phone = "0224162600",
-                            Telegram = "0000000000",
-                            TelegramCode = "1234",
-                            Address = "Mata-Ecuador",
-                            UserType = UserType.Collector
                         }
-                        , new ClientEntity
-                        {
-                            Name = "ELENA GALARRAGA",
-                            CreatedDate = DateTime.UtcNow,
-                            IsEnable = true,
-                            Dni = "98456432100",
-                            Mail = "egalarraga@yopmail.com",
-                            CellPhone = "0904575840",
-                            Phone = "0224162600",
-                            Telegram = "0000000000",
-                            TelegramCode = "1234",
-                            Address = "Ibarra-Ecuador",
-                            UserType = UserType.Collector
-                        }
+                       
 
                     );
                     await _dataContext.SaveChangesAsync();
@@ -299,10 +260,10 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             if (!_dataContext.Fuel.Any())
             {
                 await _dataContext.Fuel.AddRangeAsync(
-                    new FuelEntity { Name = "EXTRA", CreatedDate = DateTime.UtcNow },
-                    new FuelEntity { Name = "SUPER", CreatedDate = DateTime.UtcNow },
-                    new FuelEntity { Name = "ECOPAIS", CreatedDate = DateTime.UtcNow },
-                    new FuelEntity { Name = "DIESEL", CreatedDate = DateTime.UtcNow }
+                    new FuelEntity { Name = "EXTRA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new FuelEntity { Name = "SUPER", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new FuelEntity { Name = "ECOPAIS", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new FuelEntity { Name = "DIESEL", IsEnable = true, CreatedDate = DateTime.UtcNow }
                 );
                 await _dataContext.SaveChangesAsync();
 
@@ -314,14 +275,14 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             {
                 await _dataContext.Color.AddRangeAsync(
                     new ColorEntity { Name = "ROJO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "NEGRO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "AZUL", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "AMARILLO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "NARANJA", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "BLANCO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "MORADO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "PLOMO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "MARRON", CreatedDate = DateTime.UtcNow }
+                                new ColorEntity { Name = "NEGRO", IsEnable=true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "AZUL", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "AMARILLO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "NARANJA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "BLANCO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "MORADO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "PLOMO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                                new ColorEntity { Name = "MARRON", IsEnable = true, CreatedDate = DateTime.UtcNow }
                     );
                 await _dataContext.SaveChangesAsync();
 
@@ -333,12 +294,12 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             if (!_dataContext.Country.Any())
             {
                 await _dataContext.Country.AddRangeAsync(
-                    new CountryEntity { Name = "ECUADOR", CreatedDate = DateTime.UtcNow },
-                    new CountryEntity { Name = "COLOMBIA", CreatedDate = DateTime.UtcNow },
-                    new CountryEntity { Name = "CHINA", CreatedDate = DateTime.UtcNow },
-                    new CountryEntity { Name = "JAPON", CreatedDate = DateTime.UtcNow },
-                    new CountryEntity { Name = "TAILANDIA", CreatedDate = DateTime.UtcNow },
-                    new CountryEntity { Name = "U.S.A", CreatedDate = DateTime.UtcNow }
+                    new CountryEntity { Name = "ECUADOR", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new CountryEntity { Name = "COLOMBIA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new CountryEntity { Name = "CHINA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new CountryEntity { Name = "JAPON", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new CountryEntity { Name = "TAILANDIA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new CountryEntity { Name = "U.S.A", IsEnable = true, CreatedDate = DateTime.UtcNow }
                 );
                 await _dataContext.SaveChangesAsync();
 

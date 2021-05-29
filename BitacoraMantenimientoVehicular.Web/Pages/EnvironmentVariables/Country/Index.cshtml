@@ -45,6 +45,8 @@
                         groupItems.AddSimpleFor(m => m.Name)
                             .ColSpan(2)
                             .Editor(editor => editor.TextArea().Height(100));
+                        groupItems.AddSimpleFor(m => m.IsEnable)
+                            .Editor(editor => editor.Switch());
                     });
             }))
     )

@@ -44,7 +44,7 @@
                     groupItems.AddSimpleFor(m => m.Phone);
                     groupItems.AddSimpleFor(m => m.CellPhone);
                     groupItems.AddSimpleFor(m => m.UserType);
-                    groupItems.AddSimpleFor(m => m.IsEnable);
+                    groupItems.AddSimpleFor(m => m.IsEnable).Editor(editor => editor.Switch());
                 });
 
             items.AddGroup()
@@ -136,13 +136,13 @@
             {
                 vr.AddRequired().Message("Cell Phone Number is required");
             });
-        
-            columns.AddFor(m => m.UserType)
-                .Lookup(lookup => lookup
-                    .DataSource(Html.GetEnumSelectList<UserType>().Select(i => new {Value = int.Parse(i.Value), Text = i.Text}))
-                    .ValueExpr("Value")
-                    .DisplayExpr("Text")
-                );
+
+        columns.AddFor(m => m.UserType)
+            .Lookup(lookup => lookup
+                .DataSource(Html.GetEnumSelectList<UserType>().Select(i => new {Value = int.Parse(i.Value), Text = i.Text}))
+                .ValueExpr("Value")
+                .DisplayExpr("Text")
+            );
         columns.AddFor(m => m.Telegram).AllowSearch(true).EditorOptions(new { showClearButton = true });
         columns.AddFor(m => m.TelegramCode).EditorOptions(new {mask="0000", showClearButton = true });
         columns.AddFor(m => m.IsEnable).EditorOptions(new { showClearButton = true }).AllowSearch(true);
@@ -156,7 +156,6 @@
     function exporting(e) {
         var workbook = new window.ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Clients');
-
         DevExpress.excelExporter.exportDataGrid({
             component: e.component,
             worksheet: worksheet,
