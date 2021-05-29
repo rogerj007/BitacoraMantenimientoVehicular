@@ -13,8 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NETCore.MailKit.Extensions;
-using NETCore.MailKit.Infrastructure.Internal;
+
 
 namespace BitacoraMantenimientoVehicular.Web
 {
@@ -44,22 +43,7 @@ namespace BitacoraMantenimientoVehicular.Web
                 options.AccessDeniedPath = "/Account/NotAuthorized";
             });
 
-            //Add MailKit
-            services.AddMailKit(optionBuilder =>
-            {
-                optionBuilder.UseMailKit(new MailKitOptions()
-                {
-                    //get options from sercets.json
-                    Server = Configuration["Email:Server"],
-                    Port = Convert.ToInt32(Configuration["Email:Port"]),
-                    SenderName = Configuration["Email:SenderName"],
-                    SenderEmail = Configuration["Email:SenderEmail"],
-
-                    //can be optional with no authentication 
-                    Account = Configuration["Email:Account"],
-                    Password = Configuration["Email:Password"]
-                });
-            });
+           
 
             services.AddIdentity<UserEntity, IdentityRole>(cfg =>
             {

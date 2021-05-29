@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
+
 
 namespace BitacoraMantenimientoVehicular.Bot.Helpers
 {
@@ -41,26 +41,7 @@ namespace BitacoraMantenimientoVehicular.Bot.Helpers
                 throw new AggregateException(exceptions);
         }
 
-        public static StringBuilder SqlExceptionMessage(this SqlException ex)
-        {
-            var sqlErrorMessages = new StringBuilder("Sql Exception:\n");
-
-            foreach (SqlError error in ex.Errors)
-            {
-                sqlErrorMessages.AppendFormat("Mesage: {0}\n", error.Message)
-                    .AppendFormat("Severity level: {0}\n", error.Class)
-                    .AppendFormat("State: {0}\n", error.State)
-                    .AppendFormat("Number: {0}\n", error.Number)
-                    .AppendFormat("Procedure: {0}\n", error.Procedure)
-                    .AppendFormat("Source: {0}\n", error.Source)
-                    .AppendFormat("LineNumber: {0}\n", error.LineNumber)
-                    .AppendFormat("Server: {0}\n", error.Server)
-                    .AppendLine(new string('-', error.Message.Length + 7));
-
-            }
-            return sqlErrorMessages;
-        }
-
+    
         public static bool IsFileLocked(this FileInfo file)
         {
             FileStream stream = null;

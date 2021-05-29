@@ -1,7 +1,7 @@
 /*!
  * DevExpress Diagram (dx-diagram)
- * Version: 2.0.23
- * Build date: Mon Apr 19 2021
+ * Version: 2.1.15
+ * Build date: Thu May 13 2021
  * 
  * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExpress licensing here: https://www.devexpress.com/Support/EULAs
@@ -5346,6 +5346,7 @@ var DiagramSettings = /** @class */ (function () {
         this._autoZoom = AutoZoomMode.Disabled;
         this._snapToGrid = true;
         this._showGrid = true;
+        this._contextMenuEnabled = true;
         this._gridSize = 180;
         this._gridSizeItems = [90, 180, 360, 720];
         this._pageSizeItems = [
@@ -5441,6 +5442,14 @@ var DiagramSettings = /** @class */ (function () {
                 this._showGrid = value;
                 this.onViewChanged.raise1(function (l) { return l.notifyGridChanged(_this.showGrid, _this.gridSize); });
             }
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DiagramSettings.prototype, "contextMenuEnabled", {
+        get: function () { return this._contextMenuEnabled; },
+        set: function (value) {
+            this._contextMenuEnabled = value;
         },
         enumerable: false,
         configurable: true
@@ -29504,6 +29513,7 @@ var DiagramControl = /** @class */ (function () {
                 pageSize: this.model.pageSize,
                 simpleView: this.settings.simpleView,
                 readOnly: this.settings.readOnly,
+                contextMenuEnabled: this.settings.contextMenuEnabled,
                 gridSize: this.settings.gridSize,
                 gridVisible: this.settings.showGrid,
                 zoomLevel: this.settings.zoomLevel,
@@ -29609,6 +29619,22 @@ var DiagramControl = /** @class */ (function () {
     DiagramControl.prototype.getNativeItemByDataKey = function (dataKey) {
         var item = this.model.findItemByDataKey(dataKey);
         return item && this.apiController.createNativeItem(item);
+    };
+    DiagramControl.prototype.getNativeItems = function () {
+        var _this = this;
+        return this.model.items.map(function (item) { return _this.apiController.createNativeItem(item); });
+    };
+    DiagramControl.prototype.getNativeSelectedItems = function () {
+        var _this = this;
+        return this.selection.getKeys().map(function (key) { return _this.apiController.createNativeItem(_this.model.findItem(key)); });
+    };
+    DiagramControl.prototype.setSelectedItems = function (keys) {
+        this.selection.set(keys);
+    };
+    DiagramControl.prototype.scrollToItems = function (keys) {
+        var _this = this;
+        var rectangle = Utils_1.GeometryUtils.getCommonRectangle(keys.map(function (key) { return _this.model.findItem(key).rectangle; }));
+        this.view.scrollIntoView(rectangle);
     };
     DiagramControl.prototype.setInitialStyleProperties = function (style) {
         this.selection.inputPosition.setInitialStyleProperties(style);
@@ -33813,6 +33839,7 @@ var RenderManager = /** @class */ (function () {
         this.items = new CanvasItemsManager_1.CanvasItemsManager(this.view.canvasElement, settings.zoomLevel, this.dom);
         this.page = new CanvasPageManager_1.CanvasPageManager(this.view.pageElement, settings, this.dom);
         this.selection = new CanvasSelectionManager_1.CanvasSelectionManager(this.view.canvasElement, settings.zoomLevel, settings.readOnly, this.dom);
+        this.contextMenuEnabled = settings.contextMenuEnabled;
         this.view.onViewChanged.add(this.page);
         this.view.onViewChanged.add(this.items);
         this.view.onViewChanged.add(this.selection);
@@ -33960,6 +33987,8 @@ var RenderManager = /** @class */ (function () {
     };
     RenderManager.prototype.onContextMenu = function (evt) {
         var _this = this;
+        if (!this.contextMenuEnabled)
+            return;
         Utils_1.raiseEvent(evt, this.createDiagramContextMenuEvent(evt), function (e) { return _this.events.onContextMenu(e); });
         this.input.captureFocus();
         return evt_1.EvtUtils.preventEventAndBubble(evt);

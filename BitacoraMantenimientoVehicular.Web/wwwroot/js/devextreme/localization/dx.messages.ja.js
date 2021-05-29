@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 20.2.7
-* Build date: Thu Apr 22 2021
+* Version: 21.1.3
+* Build date: Tue May 18 2021
 *
 * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -10,17 +10,15 @@
 
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
-        define(function(require) {
+        define((function(require) {
             factory(require("devextreme/localization"))
-        })
+        }))
+    } else if ("object" === typeof module && module.exports) {
+        factory(require("devextreme/localization"))
     } else {
-        if ("object" === typeof module && module.exports) {
-            factory(require("devextreme/localization"))
-        } else {
-            factory(DevExpress.localization)
-        }
+        factory(DevExpress.localization)
     }
-}(this, function(localization) {
+}(0, (function(localization) {
     localization.loadMessages({
         ja: {
             Yes: "\u306f\u3044",
@@ -280,7 +278,7 @@
             "dxFilterBuilder-filterOperationNoneOf": "\u3059\u3079\u3066\u542b\u307e\u306a\u3044",
             "dxHtmlEditor-dialogColorCaption": "\u30d5\u30a9\u30f3\u30c8\u306e\u8272\u3092\u5909\u66f4",
             "dxHtmlEditor-dialogBackgroundCaption": "\u80cc\u666f\u8272\u3092\u5909\u66f4",
-            "dxHtmlEditor-dialogLinkCaption": "\u30ea\u30f3\u30af\u3092\u8ffd\u52a0",
+            "dxHtmlEditor-dialogLinkCaption": "\u30ea\u30f3\u30af\u306e\u8ffd\u52a0",
             "dxHtmlEditor-dialogLinkUrlField": "URL",
             "dxHtmlEditor-dialogLinkTextField": "\u30c6\u30ad\u30b9\u30c8",
             "dxHtmlEditor-dialogLinkTargetField": "\u30ea\u30f3\u30af\u3092\u65b0\u3057\u3044\u30a6\u30a3\u30f3\u30c9\u30a6\u3067\u958b\u304f",
@@ -294,6 +292,50 @@
             "dxHtmlEditor-dialogInsertTableCaption": "\u30c6\u30fc\u30d6\u30eb\u306e\u633f\u5165",
             "dxHtmlEditor-heading": "\u898b\u51fa\u3057",
             "dxHtmlEditor-normalText": "\u6a19\u6e96\u30c6\u30ad\u30b9\u30c8",
+            "dxHtmlEditor-background": "\u80cc\u666f\u8272",
+            "dxHtmlEditor-bold": "\u592a\u5b57",
+            "dxHtmlEditor-color": "\u30d5\u30a9\u30f3\u30c8\u306e\u8272",
+            "dxHtmlEditor-font": "\u30d5\u30a9\u30f3\u30c8",
+            "dxHtmlEditor-italic": "\u659c\u4f53",
+            "dxHtmlEditor-link": "\u30ea\u30f3\u30af\u306e\u8ffd\u52a0",
+            "dxHtmlEditor-image": "\u753b\u50cf\u306e\u8ffd\u52a0",
+            "dxHtmlEditor-size": "\u30d5\u30a9\u30f3\u30c8 \u30b5\u30a4\u30ba",
+            "dxHtmlEditor-strike": "\u53d6\u308a\u6d88\u3057\u7dda",
+            "dxHtmlEditor-subscript": "\u4e0b\u4ed8\u304d\u6587\u5b57",
+            "dxHtmlEditor-superscript": "\u4e0a\u4ed8\u304d\u6587\u5b57",
+            "dxHtmlEditor-underline": "\u4e0b\u7dda",
+            "dxHtmlEditor-blockquote": "\u30d6\u30ed\u30c3\u30af\u5f15\u7528",
+            "dxHtmlEditor-header": "\u30d8\u30c3\u30c0\u30fc",
+            "dxHtmlEditor-increaseIndent": "\u30a4\u30f3\u30c7\u30f3\u30c8\u3092\u5897\u3084\u3059",
+            "dxHtmlEditor-decreaseIndent": "\u30a4\u30f3\u30c7\u30f3\u30c8\u3092\u6e1b\u3089\u3059",
+            "dxHtmlEditor-orderedList": "\u756a\u53f7\u4ed8\u304d\u30ea\u30b9\u30c8",
+            "dxHtmlEditor-bulletList": "\u7b87\u6761\u66f8\u304d\u30ea\u30b9\u30c8",
+            "dxHtmlEditor-alignLeft": "\u5de6\u63c3\u3048",
+            "dxHtmlEditor-alignCenter": "\u4e2d\u592e\u63c3\u3048",
+            "dxHtmlEditor-alignRight": "\u53f3\u63c3\u3048",
+            "dxHtmlEditor-alignJustify": "\u4e21\u7aef\u63c3\u3048",
+            "dxHtmlEditor-codeBlock": "\u30b3\u30fc\u30c9 \u30d6\u30ed\u30c3\u30af",
+            "dxHtmlEditor-variable": "\u5909\u6570\u306e\u8ffd\u52a0",
+            "dxHtmlEditor-undo": "\u5143\u306b\u623b\u3059",
+            "dxHtmlEditor-redo": "\u3084\u308a\u76f4\u3059",
+            "dxHtmlEditor-clear": "\u66f8\u5f0f\u306e\u30af\u30ea\u30a2",
+            "dxHtmlEditor-insertTable": "\u30c6\u30fc\u30d6\u30eb\u306e\u633f\u5165",
+            "dxHtmlEditor-insertRowAbove": "\u4e0a\u306b\u884c\u3092\u633f\u5165",
+            "dxHtmlEditor-insertRowBelow": "\u4e0b\u306b\u884c\u3092\u633f\u5165",
+            "dxHtmlEditor-insertColumnLeft": "\u5de6\u306b\u5217\u3092\u633f\u5165",
+            "dxHtmlEditor-insertColumnRight": "\u53f3\u306b\u5217\u3092\u633f\u5165",
+            "dxHtmlEditor-deleteColumn": "\u5217\u306e\u524a\u9664",
+            "dxHtmlEditor-deleteRow": "\u884c\u306e\u524a\u9664",
+            "dxHtmlEditor-deleteTable": "\u30c6\u30fc\u30d6\u30eb\u306e\u524a\u9664",
+            "dxHtmlEditor-list": "\u30ea\u30b9\u30c8",
+            "dxHtmlEditor-ordered": "\u756a\u53f7\u4ed8\u304d",
+            "dxHtmlEditor-bullet": "\u7b87\u6761\u66f8\u304d",
+            "dxHtmlEditor-align": "\u914d\u7f6e",
+            "dxHtmlEditor-center": "\u4e2d\u592e",
+            "dxHtmlEditor-left": "\u5de6",
+            "dxHtmlEditor-right": "\u53f3",
+            "dxHtmlEditor-indent": "\u30a4\u30f3\u30c7\u30f3\u30c8",
+            "dxHtmlEditor-justify": "\u4e21\u7aef\u63c3\u3048",
             "dxFileManager-newDirectoryName": "\u7121\u984c\u306e\u30d5\u30a9\u30eb\u30c0",
             "dxFileManager-rootDirectoryName": "\u30d5\u30a1\u30a4\u30eb",
             "dxFileManager-errorNoAccess": "\u30a2\u30af\u30bb\u30b9\u304c\u62d2\u5426\u3055\u308c\u307e\u3057\u305f\u3002\u64cd\u4f5c\u3092\u5b8c\u4e86\u3067\u304d\u307e\u305b\u3093\u3002",
@@ -539,7 +581,8 @@
             "dxGantt-deleteSelectedTask": "\u9078\u629e\u3057\u305f\u30bf\u30b9\u30af\u3092\u524a\u9664",
             "dxGantt-zoomIn": "\u62e1\u5927",
             "dxGantt-zoomOut": "\u7e2e\u5c0f",
-            "dxGantt-fullScreen": "\u5168\u753b\u9762\u8868\u793a"
+            "dxGantt-fullScreen": "\u5168\u753b\u9762\u8868\u793a",
+            "dxGantt-quarter": "Q{0}"
         }
     })
-});
+}));

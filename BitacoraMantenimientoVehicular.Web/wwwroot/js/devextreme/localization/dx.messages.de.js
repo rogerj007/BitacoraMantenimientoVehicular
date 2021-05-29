@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 20.2.7
-* Build date: Thu Apr 22 2021
+* Version: 21.1.3
+* Build date: Tue May 18 2021
 *
 * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -10,17 +10,15 @@
 
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
-        define(function(require) {
+        define((function(require) {
             factory(require("devextreme/localization"))
-        })
+        }))
+    } else if ("object" === typeof module && module.exports) {
+        factory(require("devextreme/localization"))
     } else {
-        if ("object" === typeof module && module.exports) {
-            factory(require("devextreme/localization"))
-        } else {
-            factory(DevExpress.localization)
-        }
+        factory(DevExpress.localization)
     }
-}(this, function(localization) {
+}(0, (function(localization) {
     localization.loadMessages({
         de: {
             Yes: "Ja",
@@ -294,6 +292,50 @@
             "dxHtmlEditor-dialogInsertTableCaption": "Tabelle einf\xfcgen",
             "dxHtmlEditor-heading": "\xdcberschrift",
             "dxHtmlEditor-normalText": "Normaler Text",
+            "dxHtmlEditor-background": "Hintergrundfarbe",
+            "dxHtmlEditor-bold": "Fett",
+            "dxHtmlEditor-color": "Schriftfarbe",
+            "dxHtmlEditor-font": "Schriftart",
+            "dxHtmlEditor-italic": "Kursiv",
+            "dxHtmlEditor-link": "Link hinzuf\xfcgen",
+            "dxHtmlEditor-image": "Bild hinzuf\xfcgen",
+            "dxHtmlEditor-size": "Schriftgr\xf6\xdfe",
+            "dxHtmlEditor-strike": "Durchgestrichen",
+            "dxHtmlEditor-subscript": "Tiefgestellt",
+            "dxHtmlEditor-superscript": "Hochgestellt",
+            "dxHtmlEditor-underline": "Unterstrichen",
+            "dxHtmlEditor-blockquote": "Blockzitat",
+            "dxHtmlEditor-header": "Kopfzeile",
+            "dxHtmlEditor-increaseIndent": "Einzug vergr\xf6\xdfern",
+            "dxHtmlEditor-decreaseIndent": "Einzug verkleinern",
+            "dxHtmlEditor-orderedList": "Sortierte Liste",
+            "dxHtmlEditor-bulletList": "Aufz\xe4hlung",
+            "dxHtmlEditor-alignLeft": "Linksb\xfcndig",
+            "dxHtmlEditor-alignCenter": "Zentriert",
+            "dxHtmlEditor-alignRight": "Rechtsb\xfcndig",
+            "dxHtmlEditor-alignJustify": "Blocksatz",
+            "dxHtmlEditor-codeBlock": "Codeblock",
+            "dxHtmlEditor-variable": "Variable hinzuf\xfcgen",
+            "dxHtmlEditor-undo": "R\xfcckg\xe4ngig",
+            "dxHtmlEditor-redo": "Wiederholen",
+            "dxHtmlEditor-clear": "Formate l\xf6schen",
+            "dxHtmlEditor-insertTable": "Tabelle einf\xfcgen",
+            "dxHtmlEditor-insertRowAbove": "Spalte oberhalb einf\xfcgen",
+            "dxHtmlEditor-insertRowBelow": "Spalte unterhalb einf\xfcgen",
+            "dxHtmlEditor-insertColumnLeft": "Spalte links einf\xfcgen",
+            "dxHtmlEditor-insertColumnRight": "Spalte rechts einf\xfcgen",
+            "dxHtmlEditor-deleteColumn": "Spalte l\xf6schen",
+            "dxHtmlEditor-deleteRow": "Zeile l\xf6schen",
+            "dxHtmlEditor-deleteTable": "Tabelle l\xf6schen",
+            "dxHtmlEditor-list": "Liste",
+            "dxHtmlEditor-ordered": "Sortiert",
+            "dxHtmlEditor-bullet": "Aufz\xe4hlung",
+            "dxHtmlEditor-align": "Ausrichten",
+            "dxHtmlEditor-center": "Zentrieren",
+            "dxHtmlEditor-left": "Links",
+            "dxHtmlEditor-right": "Rechts",
+            "dxHtmlEditor-indent": "Einzug",
+            "dxHtmlEditor-justify": "Blocksatz",
             "dxFileManager-newDirectoryName": "Ohne Titel",
             "dxFileManager-rootDirectoryName": "Dateien",
             "dxFileManager-errorNoAccess": "Zugriff verweigert. Die Operation kann nicht durchgef\xfchrt werden.",
@@ -539,7 +581,8 @@
             "dxGantt-deleteSelectedTask": "Ausgew\xe4hlte Aufgabe l\xf6schen",
             "dxGantt-zoomIn": "Vergr\xf6\xdfern",
             "dxGantt-zoomOut": "Verkleinern",
-            "dxGantt-fullScreen": "Vollbildmodus"
+            "dxGantt-fullScreen": "Vollbildmodus",
+            "dxGantt-quarter": "Q{0}"
         }
     })
-});
+}));

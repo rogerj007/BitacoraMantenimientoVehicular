@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 20.2.7
-* Build date: Thu Apr 22 2021
+* Version: 21.1.3
+* Build date: Tue May 18 2021
 *
 * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -10,17 +10,15 @@
 
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
-        define(function(require) {
+        define((function(require) {
             factory(require("devextreme/localization"))
-        })
+        }))
+    } else if ("object" === typeof module && module.exports) {
+        factory(require("devextreme/localization"))
     } else {
-        if ("object" === typeof module && module.exports) {
-            factory(require("devextreme/localization"))
-        } else {
-            factory(DevExpress.localization)
-        }
+        factory(DevExpress.localization)
     }
-}(this, function(localization) {
+}(0, (function(localization) {
     localization.loadMessages({
         en: {
             Yes: "Yes",
@@ -294,6 +292,50 @@
             "dxHtmlEditor-dialogInsertTableCaption": "Insert Table",
             "dxHtmlEditor-heading": "Heading",
             "dxHtmlEditor-normalText": "Normal text",
+            "dxHtmlEditor-background": "Background Color",
+            "dxHtmlEditor-bold": "Bold",
+            "dxHtmlEditor-color": "Font Color",
+            "dxHtmlEditor-font": "Font",
+            "dxHtmlEditor-italic": "Italic",
+            "dxHtmlEditor-link": "Add Link",
+            "dxHtmlEditor-image": "Add Image",
+            "dxHtmlEditor-size": "Size",
+            "dxHtmlEditor-strike": "Strikethrough",
+            "dxHtmlEditor-subscript": "Subscript",
+            "dxHtmlEditor-superscript": "Superscript",
+            "dxHtmlEditor-underline": "Underline",
+            "dxHtmlEditor-blockquote": "Blockquote",
+            "dxHtmlEditor-header": "Header",
+            "dxHtmlEditor-increaseIndent": "Increase Indent",
+            "dxHtmlEditor-decreaseIndent": "Decrease Indent",
+            "dxHtmlEditor-orderedList": "Ordered List",
+            "dxHtmlEditor-bulletList": "Bullet List",
+            "dxHtmlEditor-alignLeft": "Align Left",
+            "dxHtmlEditor-alignCenter": "Align Center",
+            "dxHtmlEditor-alignRight": "Align Right",
+            "dxHtmlEditor-alignJustify": "Align Justify",
+            "dxHtmlEditor-codeBlock": "Code Block",
+            "dxHtmlEditor-variable": "Add Variable",
+            "dxHtmlEditor-undo": "Undo",
+            "dxHtmlEditor-redo": "Redo",
+            "dxHtmlEditor-clear": "Clear Formatting",
+            "dxHtmlEditor-insertTable": "Insert Table",
+            "dxHtmlEditor-insertRowAbove": "Insert Row Above",
+            "dxHtmlEditor-insertRowBelow": "Insert Row Below",
+            "dxHtmlEditor-insertColumnLeft": "Insert Column Left",
+            "dxHtmlEditor-insertColumnRight": "Insert Column Right",
+            "dxHtmlEditor-deleteColumn": "Delete Column",
+            "dxHtmlEditor-deleteRow": "Delete Row",
+            "dxHtmlEditor-deleteTable": "Delete Table",
+            "dxHtmlEditor-list": "List",
+            "dxHtmlEditor-ordered": "Ordered",
+            "dxHtmlEditor-bullet": "Bullet",
+            "dxHtmlEditor-align": "Align",
+            "dxHtmlEditor-center": "Center",
+            "dxHtmlEditor-left": "Left",
+            "dxHtmlEditor-right": "Right",
+            "dxHtmlEditor-indent": "Indent",
+            "dxHtmlEditor-justify": "Justify",
             "dxFileManager-newDirectoryName": "Untitled directory",
             "dxFileManager-rootDirectoryName": "Files",
             "dxFileManager-errorNoAccess": "Access Denied. Operation could not be completed.",
@@ -539,7 +581,8 @@
             "dxGantt-deleteSelectedTask": "Delete Selected Task",
             "dxGantt-zoomIn": "Zoom In",
             "dxGantt-zoomOut": "Zoom Out",
-            "dxGantt-fullScreen": "Full Screen"
+            "dxGantt-fullScreen": "Full Screen",
+            "dxGantt-quarter": "Q{0}"
         }
     })
-});
+}));

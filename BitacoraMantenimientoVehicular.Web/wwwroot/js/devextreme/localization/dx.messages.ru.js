@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 20.2.7
-* Build date: Thu Apr 22 2021
+* Version: 21.1.3
+* Build date: Tue May 18 2021
 *
 * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -10,17 +10,15 @@
 
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
-        define(function(require) {
+        define((function(require) {
             factory(require("devextreme/localization"))
-        })
+        }))
+    } else if ("object" === typeof module && module.exports) {
+        factory(require("devextreme/localization"))
     } else {
-        if ("object" === typeof module && module.exports) {
-            factory(require("devextreme/localization"))
-        } else {
-            factory(DevExpress.localization)
-        }
+        factory(DevExpress.localization)
     }
-}(this, function(localization) {
+}(0, (function(localization) {
     localization.loadMessages({
         ru: {
             Yes: "\u0414\u0430",
@@ -294,6 +292,50 @@
             "dxHtmlEditor-dialogInsertTableCaption": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u0442\u0430\u0431\u043b\u0438\u0446\u0443",
             "dxHtmlEditor-heading": "\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a",
             "dxHtmlEditor-normalText": "\u041e\u0431\u044b\u0447\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442",
+            "dxHtmlEditor-background": "\u0426\u0432\u0435\u0442 \u0444\u043e\u043d\u0430",
+            "dxHtmlEditor-bold": "\u041f\u043e\u043b\u0443\u0436\u0438\u0440\u043d\u044b\u0439",
+            "dxHtmlEditor-color": "\u0426\u0432\u0435\u0442 \u0442\u0435\u043a\u0441\u0442\u0430",
+            "dxHtmlEditor-font": "\u0428\u0440\u0438\u0444\u0442",
+            "dxHtmlEditor-italic": "\u041a\u0443\u0440\u0441\u0438\u0432",
+            "dxHtmlEditor-link": "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0441\u044b\u043b\u043a\u0443",
+            "dxHtmlEditor-image": "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435",
+            "dxHtmlEditor-size": "\u0420\u0430\u0437\u043c\u0435\u0440 \u0448\u0440\u0438\u0444\u0442\u0430",
+            "dxHtmlEditor-strike": "\u0417\u0430\u0447\u0435\u0440\u043a\u043d\u0443\u0442\u044b\u0439",
+            "dxHtmlEditor-subscript": "\u041d\u0438\u0436\u043d\u0438\u0439 \u0438\u043d\u0434\u0435\u043a\u0441",
+            "dxHtmlEditor-superscript": "\u0412\u0435\u0440\u0445\u043d\u0438\u0439 \u0438\u043d\u0434\u0435\u043a\u0441",
+            "dxHtmlEditor-underline": "\u041f\u043e\u0434\u0447\u0435\u0440\u043a\u043d\u0443\u0442\u044b\u0439",
+            "dxHtmlEditor-blockquote": "\u0426\u0438\u0442\u0430\u0442\u0430",
+            "dxHtmlEditor-header": "\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a",
+            "dxHtmlEditor-increaseIndent": "\u0423\u0432\u0435\u043b\u0438\u0447\u0438\u0442\u044c \u043e\u0442\u0441\u0442\u0443\u043f",
+            "dxHtmlEditor-decreaseIndent": "\u0423\u043c\u0435\u043d\u044c\u0448\u0438\u0442\u044c \u043e\u0442\u0441\u0442\u0443\u043f",
+            "dxHtmlEditor-orderedList": "\u041d\u0443\u043c\u0435\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a",
+            "dxHtmlEditor-bulletList": "\u041c\u0430\u0440\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a",
+            "dxHtmlEditor-alignLeft": "\u0412\u044b\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u043d\u0438\u0435 \u043f\u043e \u043b\u0435\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e",
+            "dxHtmlEditor-alignCenter": "\u0412\u044b\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u043d\u0438\u0435 \u043f\u043e \u0446\u0435\u043d\u0442\u0440\u0443",
+            "dxHtmlEditor-alignRight": "\u0412\u044b\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u043d\u0438\u0435 \u043f\u043e \u043f\u0440\u0430\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e",
+            "dxHtmlEditor-alignJustify": "\u0412\u044b\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u043d\u0438\u0435 \u043f\u043e \u0448\u0438\u0440\u0438\u043d\u0435",
+            "dxHtmlEditor-codeBlock": "\u0411\u043b\u043e\u043a \u043a\u043e\u0434\u0430",
+            "dxHtmlEditor-variable": "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u0435\u0440\u0435\u043c\u0435\u043d\u043d\u0443\u044e",
+            "dxHtmlEditor-undo": "\u041e\u0442\u043c\u0435\u043d\u0438\u0442\u044c",
+            "dxHtmlEditor-redo": "\u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u044c",
+            "dxHtmlEditor-clear": "\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0444\u043e\u0440\u043c\u0430\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435",
+            "dxHtmlEditor-insertTable": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u0442\u0430\u0431\u043b\u0438\u0446\u0443",
+            "dxHtmlEditor-insertRowAbove": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443 \u0441\u0432\u0435\u0440\u0445\u0443",
+            "dxHtmlEditor-insertRowBelow": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443 \u0441\u043d\u0438\u0437\u0443",
+            "dxHtmlEditor-insertColumnLeft": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u043a\u043e\u043b\u043e\u043d\u043a\u0443 \u0441\u043b\u0435\u0432\u0430",
+            "dxHtmlEditor-insertColumnRight": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u043a\u043e\u043b\u043e\u043d\u043a\u0443 \u0441\u043f\u0440\u0430\u0432\u0430",
+            "dxHtmlEditor-deleteColumn": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043a\u043e\u043b\u043e\u043d\u043a\u0443",
+            "dxHtmlEditor-deleteRow": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443",
+            "dxHtmlEditor-deleteTable": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0442\u0430\u0431\u043b\u0438\u0446\u0443",
+            "dxHtmlEditor-list": "\u0421\u043f\u0438\u0441\u043e\u043a",
+            "dxHtmlEditor-ordered": "\u041d\u0443\u043c\u0435\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439",
+            "dxHtmlEditor-bullet": "\u041c\u0430\u0440\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439",
+            "dxHtmlEditor-align": "\u0412\u044b\u0440\u0430\u0432\u043d\u0438\u0432\u0430\u043d\u0438\u0435",
+            "dxHtmlEditor-center": "\u041f\u043e \u0446\u0435\u043d\u0442\u0440\u0443",
+            "dxHtmlEditor-left": "\u041f\u043e \u043b\u0435\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e",
+            "dxHtmlEditor-right": "\u041f\u043e \u043f\u0440\u0430\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e",
+            "dxHtmlEditor-indent": "\u041e\u0442\u0441\u0442\u0443\u043f",
+            "dxHtmlEditor-justify": "\u041f\u043e \u0448\u0438\u0440\u0438\u043d\u0435",
             "dxFileManager-newDirectoryName": "\u0411\u0435\u0437 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u044f",
             "dxFileManager-rootDirectoryName": "\u0424\u0430\u0439\u043b\u044b",
             "dxFileManager-errorNoAccess": "\u0414\u043e\u0441\u0442\u0443\u043f \u0437\u0430\u043f\u0440\u0435\u0449\u0451\u043d. \u041e\u043f\u0435\u0440\u0430\u0446\u0438\u044f \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430.",
@@ -539,7 +581,8 @@
             "dxGantt-deleteSelectedTask": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u044b\u0434\u0435\u043b\u0435\u043d\u043d\u0443\u044e \u0437\u0430\u0434\u0430\u0447\u0443",
             "dxGantt-zoomIn": "\u0423\u0432\u0435\u043b\u0438\u0447\u0438\u0442\u044c \u043c\u0430\u0441\u0448\u0442\u0430\u0431",
             "dxGantt-zoomOut": "\u0423\u043c\u0435\u043d\u044c\u0448\u0438\u0442\u044c \u043c\u0430\u0441\u0448\u0442\u0430\u0431",
-            "dxGantt-fullScreen": "\u041f\u043e\u043b\u043d\u043e\u044d\u043a\u0440\u0430\u043d\u043d\u044b\u0439 \u0440\u0435\u0436\u0438\u043c"
+            "dxGantt-fullScreen": "\u041f\u043e\u043b\u043d\u043e\u044d\u043a\u0440\u0430\u043d\u043d\u044b\u0439 \u0440\u0435\u0436\u0438\u043c",
+            "dxGantt-quarter": "{0}-\u0439 \u043a\u0432."
         }
     })
-});
+}));
