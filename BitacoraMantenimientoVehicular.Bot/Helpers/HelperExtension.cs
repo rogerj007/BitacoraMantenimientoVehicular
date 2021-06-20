@@ -11,6 +11,10 @@ namespace BitacoraMantenimientoVehicular.Bot.Helpers
 {
     public static class HelperExtension
     {
+        public static bool IsInt(this string s)
+        {
+            return long.TryParse(s, out var x);
+        }
         public static T ToEnum<T>(this string value)
         {
             return (T)Enum.Parse(typeof(T), value, true);

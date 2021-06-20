@@ -20,9 +20,8 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
 
         public virtual VehicleRecordActivityEntity VehicleRecordActivity { get; set; }
 
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetimeoffset")]
         [DataType(DataType.DateTime)]
-        public DateTime CreatedDate { get; set; }
-        public DateTime CreatedDateLocal => CreatedDate.ToLocalTime();
+       public DateTimeOffset CreatedDate { get; set; }
     }
 }

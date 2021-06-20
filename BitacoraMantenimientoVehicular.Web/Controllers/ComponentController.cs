@@ -89,7 +89,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
             }
 
             if(values.Contains(ttl)) {
-                model.Ttl = Convert.ToInt16(values[ttl]);
+                model.Ttl = Convert.ToInt64(values[ttl]);
             }
 
             if(values.Contains(isEnable)) {

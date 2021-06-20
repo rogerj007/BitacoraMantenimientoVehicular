@@ -27,7 +27,7 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions)
         {
-            var client = _context.Client;
+            var client = _context.Client.OrderByDescending(c=>c.CreatedDate);
             return Json(await DataSourceLoader.LoadAsync(client, loadOptions));
         }
 

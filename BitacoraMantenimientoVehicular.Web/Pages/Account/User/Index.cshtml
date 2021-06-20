@@ -100,8 +100,8 @@
             });
         columns.AddFor(m => m.Document);
         columns.AddFor(m => m.IsEnable).AllowSearch(true);
-        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
-        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.CreatedDate).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDate).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
     })
     .Summary(s => s
         .TotalItems(totalItems => {

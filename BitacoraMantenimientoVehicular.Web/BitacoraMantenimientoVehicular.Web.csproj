@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BitacoraMantenimientoVehicular.Datasource\BitacoraMantenimientoVehicular.Datasource.csproj" />
+    <ProjectReference Include="..\BitacoraMatenimiento.Helpers\BitacoraMatenimiento.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Pages\Vehicle\WorkOrder\" />

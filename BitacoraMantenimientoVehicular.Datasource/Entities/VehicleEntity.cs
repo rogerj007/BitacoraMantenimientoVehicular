@@ -19,15 +19,13 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         public string Name { get; set; }
 
 
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetimeoffset")]
         [DataType(DataType.DateTime)]
-        public DateTime CreatedDate { get; set; }
-        public DateTime CreatedDateLocal => CreatedDate.ToLocalTime();
+       public DateTimeOffset CreatedDate { get; set; }
 
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetimeoffset")]
         [DataType(DataType.DateTime)]
-        public DateTime? ModifiedDate { get; set; }
-        public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
+        public DateTimeOffset? ModifiedDate { get; set; }
         public UserEntity CreatedBy { get; set; }
         public UserEntity ModifiedBy { get; set; }
 

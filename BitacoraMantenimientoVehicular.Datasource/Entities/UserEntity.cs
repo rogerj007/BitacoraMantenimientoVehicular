@@ -44,14 +44,12 @@ namespace BitacoraMantenimientoVehicular.Datasource.Entities
         [DataType(DataType.DateTime)]
         [Display(Name = "Creation Date")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}", ApplyFormatInEditMode = false)]
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime CreatedDateLocal => CreatedDate.ToLocalTime();
+       public DateTimeOffset CreatedDate { get; set; } = DateTime.UtcNow;
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Modification Date")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}", ApplyFormatInEditMode = false)]
-        public DateTime? ModifiedDate { get; set; }
-        public DateTime? ModifiedDateLocal => ModifiedDate?.ToLocalTime();
+        public DateTimeOffset? ModifiedDate { get; set; }
 
     }
 }

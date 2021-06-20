@@ -117,7 +117,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                 //ctsValidacionUsuario.Cancel();
                 //ctsConsultaNotasAlertasTelegram.Cancel();
                 //ctsConsultaMediosDigitales.Cancel();
-                _serilogLogger.Information("Ending service Tarifa Cero.");
+                _serilogLogger.Information("Ending service Bitacora Vehiculos...");
 
             }
         }
@@ -211,8 +211,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                         "/infouser" => SendInfoUser(message),
                         "/registro" => UpdateRecordVehicle(message),
                         "/mantenimiento" => ExecuteVehicle(message),
-
-                        _ => Usage(message)
+                        _ => throw new ArgumentOutOfRangeException()
                     };
                     await action;
 
@@ -290,33 +289,41 @@ namespace BitacoraMantenimientoVehicular.Bot
                         else
                         {
                             var placa = mensajeTelegram[0];
-                            var km = Convert.ToInt64(mensajeTelegram[1]);
-                            var consulta = _serviceProvider.GetService<ConsultaCliente>();
-                            if (consulta != null)
+                            if (!mensajeTelegram[1].IsInt())
                             {
-                                var mensaje = await consulta.RegistroActividadAsync(placa, km, message.From.Id);
-                                if (!mensaje.Item1)
-                                {
-                                    await Bot.SendTextMessageAsync(
-                                        chatId: message.Chat.Id,
-                                        text: mensaje.Item2,
-                                        replyMarkup: new ReplyKeyboardRemove()
-                                    );
-                                }
-                                else
-                                {
-                                    var requestReplyKeyboard = new ReplyKeyboardMarkup(new[]
-                                    {
-                                        KeyboardButton.WithRequestLocation(@"Enviar Ubicacion para registro")
-                                    }, true);
-                                    await Bot.SendTextMessageAsync(
-                                        chatId: message.Chat.Id,
-                                        text: "Enviar Ubicacion",
-                                        replyMarkup: requestReplyKeyboard
-                                    );
-                                }
-                               
+                                await Bot.SendTextMessageAsync(
+                                    chatId: message.Chat.Id,
+                                    text: "\U0001F5F7 Km NO valido!!!",
+                                    replyMarkup: new ReplyKeyboardRemove()
+                                );
+                                return;
+                                
                             }
+                            var km = Convert.ToInt64(mensajeTelegram[1]);
+                            if (km > 600)
+                            {
+                                    InlineKeyboardMarkup rmu = new(new[]
+                                    {
+                                        // first row
+                                        new []
+                                        {
+                                            InlineKeyboardButton.WithCallbackData("\U0001F525 Si, es correcto!", $"Correcto|{placa}|{km}"),
+                                            InlineKeyboardButton.WithCallbackData("\U0001F61E No, el valor es equivocado!", $"Equivocado"),
+                                        },
+                                    });
+                                    
+                                    var mensaje = $"\U0001F44B Hola {message.From.FirstName} , bienvenido a nuestro sistema, el valor registrado {km} es correcto?";
+
+                                    await Bot.SendTextMessageAsync(
+                                    chatId: message.Chat.Id,
+                                    text: mensaje,
+                                    replyMarkup: rmu
+                                    );
+                                   // Bot.SendTextMessageAsync(e.Message.Chat.Id, message, Telegram.Bot.Types.Enums.ParseMode.Default, false, false, 0, rmu, System.Threading.CancellationToken.None);
+
+                            }
+
+                            
                         }
                     }
 
@@ -338,7 +345,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                         
                     }
 
-
+                    //Ya no necesita
                     static async Task ExecuteVehicle(Message message)
                     {
                             var inicioMensaje = DateTime.Now.Hour switch
@@ -354,7 +361,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             var mensajeTelegram = message.Text.ToLower().Replace("/mantenimiento ", "").ToLower().Split(' ');
                             await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
                             await Task.Delay(500);
-                            if (mensajeTelegram.Length != 1)
+                            if (mensajeTelegram.Length != 2)
                             {
                                 var mensaje =
                                     $"{mensajeBase} escribe bien los parametros\nEjemplo: <b>/Mantenimiento Placa</b>";
@@ -387,24 +394,13 @@ namespace BitacoraMantenimientoVehicular.Bot
                         const string usage = "Lista de Comandos:\n" +
                                              "<b>/help</b>   - Listado de Comandos\n" +
                                              "<b>/infoUser</b> - Informacion del Usuario\n" +
-                                             "<b>/Registro</b> - Registro de Km del vehiculo\n" +
-                                             "<b>/Mantenimiento</b>  - Mantenimiento realizado\n"
-                            ;
+                                             "<b>/Registro</b> - Registro de Km del vehiculo\n";
                         await Bot.SendTextMessageAsync(
                             chatId: message.Chat.Id,
                             text: usage,
                             parseMode: ParseMode.Html,
                             replyMarkup: new ReplyKeyboardRemove()
                         );
-                    }
-
-                    static async Task Usage(Message message)
-                    {
-                        const string usage = "Lista de Comandos:\n" +
-                                             "/helpGroup   - Comandos de Ayuda\n" +
-                                             "/infoGroup - Informacion del Grupo\n" +
-                                             "/photo    - send a photo\n" +
-                                             "/request  - request location or contact";
                     }
 
                     #endregion
@@ -418,15 +414,74 @@ namespace BitacoraMantenimientoVehicular.Bot
 
         private static async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
         {
-            await Bot.AnswerCallbackQueryAsync(
-                callbackQuery.Id,
-                $"Received {callbackQuery.Data}"
-            );
+            //TODO: REGISTRO KM
+            var mensajeCallBack = callbackQuery.Data.Split('|');
+            var consulta = _serviceProvider.GetService<ConsultaCliente>();
+            var placa = Convert.ToString(mensajeCallBack[1]);
+            var km = Convert.ToInt64(mensajeCallBack[2]);
 
-            await Bot.SendTextMessageAsync(
-                callbackQuery.Message.Chat.Id,
-                $"Received {callbackQuery.Data}"
-            );
+            switch (mensajeCallBack[0])
+            {
+                case "Correcto":
+                   
+                    if (consulta != null)
+                    {
+                      
+                        var mensaje = await consulta.RegistroActividadAsync(placa, km, callbackQuery.Message.Chat.Id);
+                        if (!mensaje.Item1)
+                        {
+                            await Bot.SendTextMessageAsync(
+                                chatId: callbackQuery.Message.Chat.Id,
+                                text: mensaje.Item2,
+                                replyMarkup: new ReplyKeyboardRemove()
+                            );
+                        }
+                        else
+                        {
+                            var requestReplyKeyboard =
+                                new ReplyKeyboardMarkup(
+                                    new[]
+                                    {
+                                        KeyboardButton.WithRequestLocation(
+                                            @$"Enviar Ubicacion para registro")
+                                    }, true)
+                                { ResizeKeyboard = true };
+
+                            await Bot.SendTextMessageAsync(
+                                chatId: callbackQuery.Message.Chat.Id,
+                                text: "Enviar Ubicacion",
+                                replyMarkup: requestReplyKeyboard
+                            );
+                        }
+
+                    }
+                    break;
+                case "Equivocado":
+                    await Bot.SendTextMessageAsync(
+                        callbackQuery.Message.Chat.Id,
+                        $"Ok, vuelve a realizar el registro"
+                    );
+                    break;
+                case "MantenimientoEjecutado":
+                    if (consulta != null)
+                    {
+                        var mensaje = await consulta.MantenimientoEjecutadoAsync(placa);
+                        await Bot.SendTextMessageAsync(
+                            chatId: callbackQuery.Message.Chat.Id,
+                            text: mensaje,
+                            replyMarkup: new ReplyKeyboardRemove());
+
+                    }
+                    break;
+                case "MantenimientoNoEjecutado":
+                    await Bot.SendTextMessageAsync(
+                        callbackQuery.Message.Chat.Id,
+                        $"No se puede realizar ningun registo, porque existe un mantenimiento pendiente"
+                    );
+                    break;
+            }
+
+            
         }
 
         #region Inline Mode

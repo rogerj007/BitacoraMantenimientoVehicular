@@ -40,7 +40,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
                 await CheckVehiculeStatusAsync().ConfigureAwait(false);
                 //Create Events
                 // await CheckVehicleAsync().ConfigureAwait(false);
-                 await CheckClientAsync().ConfigureAwait(false);
+                 //await CheckClientAsync().ConfigureAwait(false);
                 
             }
             catch (Exception e)

@@ -61,7 +61,7 @@
     )
     .Grouping(grouping => grouping.AutoExpandAll(true))
     .GroupPanel(groupPanel => groupPanel.Visible(true))
-    .Height(500)
+    .Height(800)
     .HeaderFilter(h => h.Visible(true))
     .FocusedRowEnabled(true)
     .FocusedRowIndex(0)
@@ -146,8 +146,8 @@
         columns.AddFor(m => m.Telegram).AllowSearch(true).EditorOptions(new { showClearButton = true });
         columns.AddFor(m => m.TelegramCode).EditorOptions(new {mask="0000", showClearButton = true });
         columns.AddFor(m => m.IsEnable).EditorOptions(new { showClearButton = true }).AllowSearch(true);
-        columns.AddFor(m => m.CreatedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
-        columns.AddFor(m => m.ModifiedDateLocal).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.CreatedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
     })
 
     )

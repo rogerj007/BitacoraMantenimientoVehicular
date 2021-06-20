@@ -31,24 +31,29 @@ namespace BitacoraMantenimientoVehicular.Bot
             {
                 await using var context = _context.CreateDbContext();
                 var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == pTelegram.ToString());
-                var vehiculo = await context.Vehicle.Include(v => v.VehicleBrand).SingleOrDefaultAsync(u => u.Name == pPlaque);
+                var vehiculo = await context.Vehicle.Include(v => v.VehicleBrand).Include(v=>v.VehicleStatus).SingleOrDefaultAsync(u => u.Name == pPlaque);
                 if (usuario == null)
-                    return (false,"Su usuario no existe");
-                if (!usuario.IsEnable)
-                    return (false, "Su usuario esta deshabilitado)");
+                    return (false,"Su usuario en Telegram No existe");
+             
                 if (vehiculo == null)
                     return (false, $"La placa del vehiculo {pPlaque} no existe");
+                if (!usuario.IsEnable)
+                    return (false, "Su usuario esta deshabilitado, comuniquese con el admin");
 
-                var validar = await context.VehicleRecordActivity.Where(r => r.Km >= pKm).ToListAsync();
+                var usuarioHabilitado = await context.ClientEntityVehicle.SingleOrDefaultAsync(cv => cv.VehicleEntity.Id.Equals(vehiculo.Id) && cv.ClientEntity.Id.Equals(usuario.Id));
+                if(usuarioHabilitado==null)
+                    return (false, "Su usuario No esta habilitado para este Vehiculo, comuniquese con el admin");
+
+                if (vehiculo.VehicleStatus.Name == "EN TALLER")
+                    return (false, $"El vehiculo {pPlaque.ToUpper()} esta en estado de Taller, no puede registar el Km");
+                var validar = await context.VehicleRecordActivity.Where(r => r.Km >= pKm && r.Vehicle.Name.Equals(pPlaque)).ToListAsync();
                 if (validar.Count > 0)
-                {
                     return (false, "No puede ingresar un Km menor al antes registrado");
-                }
 
                 if (vehiculo.KmRegistro >= pKm)
-                {
                     return (false, "No puede ingresar un Km menor al registrado inicialmente");
-                }
+
+
 
                 var kmTemp = vehiculo.KmActual;
                 vehiculo.KmActual = pKm;
@@ -253,13 +258,11 @@ namespace BitacoraMantenimientoVehicular.Bot
                     .Where(v => vehicle != null && v.Vehicle.Id == vehicle.Id).ToListAsync();
                 if (componentsNextChange.Any(nc => !nc.IsComplete))
                 {
-
                     mensaje.Append("Aun no completa el mantenimiento anterior\n");
                     foreach (var component in componentsNextChange)
                     {
                         mensaje.Append($"Componente :{component.Component.Name} debe ser remplazado\n");
                     }
-
                     return mensaje.ToString();
                 }
 
@@ -268,6 +271,11 @@ namespace BitacoraMantenimientoVehicular.Bot
                 {
                     try
                     {
+                        var alert = recorridoUltimo - componente.Ttl;
+                        if (alert < 100)
+                        {
+                          
+                        }
                         if (recorridoUltimo <= componente.Ttl) continue;
                         var componetDb = await context.Component.SingleAsync(c => c.Id.Equals(componente.Id));
                         var registroComponente = new ComponentNextChangeEntity

@@ -117,10 +117,20 @@ namespace BitacoraMantenimientoVehicular.Bot
                         var listadoComponentesTelegram = new StringBuilder($"<b>Registro de Componentes a cambiar Vehiculo: {vehiculo.Name}</b> ");
                         listadoComponentesTelegram.Append("\n");
                         var usuarios = await context.ClientEntityVehicle.Where(v => v.VehicleEntity.Id.Equals(vehiculo.Id)).Select(v=>v.ClientEntity).ToListAsync(cancellationToken: cancellationToken.Token);
+                        if (usuarios == null || usuarios.Count==0)
+                        {
+                            _logger.LogCritical($"Vehiculo {vehiculo.Name} no tiene ningun usuario asignado!!!");
+                            return;
+                        }
                         var componentesNotificar = componenteCambio.Where(c => c.Vehicle.Id.Equals(vehiculo.Id)).ToList();
 
-                        var dueno = usuarios.Single(d => d.UserType == UserType.Owner);
+                        var dueno = usuarios.SingleOrDefault(d => d.UserType == UserType.Owner);
 
+                        if (dueno == null)
+                        {
+                            _logger.LogCritical($"Vehiculo {vehiculo.Name} no tiene dueño!!!");
+                            return;
+                        }
                        
                         using var srv = new RichEditDocumentServer();
                         var doc = srv.Document;
