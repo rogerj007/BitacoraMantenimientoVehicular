@@ -94,21 +94,14 @@ namespace BitacoraMantenimientoVehicular.Datasource
         public DbSet<ClientEntity> Client { get; set; }
         public DbSet<ColorEntity> Color { get; set; }
         public DbSet<CountryEntity> Country { get; set; }
-   
         public DbSet<FuelEntity> Fuel { get; set; }
         public DbSet<VehicleBrandEntity> VehicleBrand { get; set; }
         public DbSet<VehicleEntity> Vehicle { get; set; }
         public DbSet<VehicleStatusEntity> VehicleStatus { get; set; }
         public DbSet<ComponentEntity> Component { get; set; }
-
         public DbSet<VehicleRecordActivityEntity> VehicleRecordActivity { get; set; }
-
         public DbSet<RecordNotificationEntity> RecordNotifications { get; set; }
-
         public DbSet<ComponentNextChangeEntity> ComponentNextChange { get; set; }
-
-      
-
         public DbSet<ClientEntityVehicleEntity> ClientEntityVehicle { get; set; }
     }
 }

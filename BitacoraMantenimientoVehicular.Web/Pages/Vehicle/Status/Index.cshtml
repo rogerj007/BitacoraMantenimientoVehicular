@@ -70,8 +70,8 @@
 
         columns.AddFor(m => m.Id).AllowSearch(true).AllowEditing(false);
         columns.AddFor(m => m.Name).AllowSearch(true);
-        columns.AddFor(m => m.CreatedDate).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
-        columns.AddFor(m => m.ModifiedDate).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.CreatedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+        columns.AddFor(m => m.ModifiedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
         columns.AddFor(m => m.IsEnable);
     })
 )
