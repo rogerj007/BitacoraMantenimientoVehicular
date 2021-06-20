@@ -155,8 +155,8 @@
                                                                                 .DisplayExpr("Text")
                                                                             );
                                                                         columns.AddFor(m => m.IsEnable).Caption("Enable").DataType(GridColumnDataType.Boolean);
-                                                                        columns.AddFor(m => m.CreatedDate.ToLocalTime()).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
-                                                                        columns.AddFor(m => m.ModifiedDate.Value.ToLocalTime()).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+                                                                        columns.AddFor(m => m.CreatedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
+                                                                        columns.AddFor(m => m.ModifiedDate).DataType(GridColumnDataType.DateTime).AllowSearch(true).Format("dd-MM-yyyy HH:mm:ss").AllowEditing(false);
 
                                                 })
                                                 .DataSource(d => d.Mvc()

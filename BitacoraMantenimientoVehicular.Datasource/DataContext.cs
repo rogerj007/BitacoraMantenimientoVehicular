@@ -86,6 +86,14 @@ namespace BitacoraMantenimientoVehicular.Datasource
 
             });
 
+            builder.Entity<ComponentNextChangeEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(b => b.Component).
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
+            });
+
             builder.Entity<UserEntity>()
                 .Property(e => e.Id)
                 .ValueGeneratedOnAdd();

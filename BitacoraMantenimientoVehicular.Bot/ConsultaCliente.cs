@@ -132,7 +132,8 @@ namespace BitacoraMantenimientoVehicular.Bot
             try
             {
                 await using var context = _context.CreateDbContext();
-                var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
+                var usuario = await context.Client.FirstOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
+                //TODO: VALIDAR SI NO TIENE REGISTRO ANTERIOR
                 var existeRegistro = await context.VehicleRecordActivity.Include(v => v.Vehicle).SingleOrDefaultAsync(r => r.RegisterBy.Id.Equals(usuario.Id) &&  (r.Latitud == null || r.Longitud==null));
                 string mensaje;
                 if (existeRegistro == null)
@@ -251,44 +252,42 @@ namespace BitacoraMantenimientoVehicular.Bot
                 var mensaje = new StringBuilder();
                 var recorridoUltimo = pKm - pKmAnterior;
                 await using var context = _context.CreateDbContext();
-                var componentes = await context.Component.AsNoTracking().ToListAsync();
+                var componentes = await context.Component.Where(c=>c.IsEnable).AsNoTracking().ToListAsync();
                 var vehicleDb = await context.Vehicle.SingleAsync(v => v.Id == vehicle.Id);
                 var componentsNextChange = await context.ComponentNextChange.Include(v => v.Vehicle)
                     .Include(c => c.Component)
                     .Where(v => vehicle != null && v.Vehicle.Id == vehicle.Id).ToListAsync();
-                if (componentsNextChange.Any(nc => !nc.IsComplete))
-                {
-                    mensaje.Append("Aun no completa el mantenimiento anterior\n");
-                    foreach (var component in componentsNextChange)
-                    {
-                        mensaje.Append($"Componente :{component.Component.Name} debe ser remplazado\n");
-                    }
-                    return mensaje.ToString();
-                }
-
-               
+                var kmRecorrido = pKm - pKmAnterior;
+                //Creacion por primera vez componente
                 foreach (var componente in componentes)
                 {
                     try
                     {
-                        var alert = recorridoUltimo - componente.Ttl;
-                        if (alert < 100)
+                        var validarTiempoVidaComponente = componentsNextChange.SingleOrDefault(c => c.Component.Id.Equals(componente.Id) && c.Vehicle.Id.Equals(vehicle.Id));
+                        if (validarTiempoVidaComponente != null)
                         {
-                          
+                            var ttl = validarTiempoVidaComponente.Km - kmRecorrido;
+                            validarTiempoVidaComponente.Km = ttl>0?ttl:0;
+                            validarTiempoVidaComponente.ModifiedDate = DateTimeOffset.UtcNow;
+                            if (validarTiempoVidaComponente.Km <= 250)
+                            {
+                                mensaje.Append($"Componente : {componente.Name} debe ser remplazado cada {componente.Ttl} y tiene menos de {validarTiempoVidaComponente.Km} Km\n");
+                                validarTiempoVidaComponente.IsComplete = false;
+                            }
                         }
-                        if (recorridoUltimo <= componente.Ttl) continue;
-                        var componetDb = await context.Component.SingleAsync(c => c.Id.Equals(componente.Id));
-                        var registroComponente = new ComponentNextChangeEntity
+                        else
                         {
-                            Vehicle = vehicleDb,
-                            CreatedDate = DateTime.UtcNow,
-                            Km = pKm,
-                            Component = componetDb,
-                            IsComplete = false
-                        };
-                       
-                        mensaje.Append($"Componente : {componente.Name} debe ser remplazado cada {componente.Ttl} Km\n");
-                        await context.AddAsync(registroComponente);
+                            var componetDb = await context.Component.SingleAsync(c => c.Id.Equals(componente.Id));
+                            var registroComponente = new ComponentNextChangeEntity
+                            {
+                                Vehicle = vehicleDb,
+                                CreatedDate = DateTime.UtcNow,
+                                Km = componente.Ttl - kmRecorrido,
+                                Component = componetDb,
+                                IsComplete = true
+                            };
+                            await context.AddAsync(registroComponente);
+                        }
                         await context.SaveChangesAsync();
                     }
                     catch (Exception e)

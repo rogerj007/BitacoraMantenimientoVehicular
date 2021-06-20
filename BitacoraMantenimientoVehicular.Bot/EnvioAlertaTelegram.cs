@@ -50,30 +50,33 @@ namespace BitacoraMantenimientoVehicular.Bot
                     foreach (var notificar in notificaciones)
                     {
                         var consulta = await context.RecordNotifications.SingleAsync(n=>n.Id.Equals(notificar.Id), cancellationToken: cancellationToken.Token);
-                        if (!notificar.Telegram)
+
+                        if (notificar.VehicleRecordActivity != null)
                         {
-                            await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
-                            if (notificar.VehicleRecordActivity.Latitud != null && notificar.VehicleRecordActivity.Longitud != null)
+                            if (!notificar.Telegram)
+                            {
+                                await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
+                                if (notificar.VehicleRecordActivity.Latitud != null && notificar.VehicleRecordActivity.Longitud != null)
                                     await Program.Bot.SendVenueAsync(
                                         notificar.Client.Telegram,
-                                   
-                                        (float) notificar.VehicleRecordActivity.Latitud,
-                                        (float) notificar.VehicleRecordActivity.Longitud,
+
+                                        (float)notificar.VehicleRecordActivity.Latitud,
+                                        (float)notificar.VehicleRecordActivity.Longitud,
                                         title: $"Registro Vehiculo:{notificar.Vehicle.Name} Km: {notificar.VehicleRecordActivity.Km}",
                                         address: "",
                                         cancellationToken: cancellationToken.Token);
-                            consulta.Telegram = true;
-                        }
+                                consulta.Telegram = true;
+                            }
 
-                        if (!notificar.Mail)
-                        {
-                            var mensaje = new StringBuilder("<b>Registro de Actividad</b> ");
-                            mensaje.Append("<br><br>");
-                            mensaje.Append($"<b>Vehiculo:</b> {notificar.Vehicle.Name} registro el Km actual : <b>{notificar.VehicleRecordActivity.Km}<br>");
-                            mensaje.Append($"<b>Latitud:</b> { notificar.VehicleRecordActivity.Latitud} <b>Longitud:</b> {notificar.VehicleRecordActivity.Longitud}<br>");
-                            consulta.Mail = mensaje.ToString().SendMail(notificar.Client.Mail, "Registro de Km Actual");
+                            if (!notificar.Mail)
+                            {
+                                var mensaje = new StringBuilder("<b>Registro de Actividad</b> ");
+                                mensaje.Append("<br><br>");
+                                mensaje.Append($"<b>Vehiculo:</b> {notificar.Vehicle.Name} registro el Km actual : <b>{notificar.VehicleRecordActivity.Km}<br>");
+                                mensaje.Append($"<b>Latitud:</b> { notificar.VehicleRecordActivity.Latitud} <b>Longitud:</b> {notificar.VehicleRecordActivity.Longitud}<br>");
+                                consulta.Mail = mensaje.ToString().SendMail(notificar.Client.Mail, "Registro de Km Actual");
+                            }
                         }
-
                         await context.SaveChangesAsync(cancellationToken.Token);
                     }
                     var proxEnvio = 1;

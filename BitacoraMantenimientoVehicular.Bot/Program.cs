@@ -300,6 +300,10 @@ namespace BitacoraMantenimientoVehicular.Bot
                                 
                             }
                             var km = Convert.ToInt64(mensajeTelegram[1]);
+                            if (km > 1000)
+                            {
+
+                            }
                             if (km > 600)
                             {
                                     InlineKeyboardMarkup rmu = new(new[]
@@ -449,7 +453,7 @@ namespace BitacoraMantenimientoVehicular.Bot
 
                             await Bot.SendTextMessageAsync(
                                 chatId: callbackQuery.Message.Chat.Id,
-                                text: "Enviar Ubicacion",
+                                text: mensaje.Item2,
                                 replyMarkup: requestReplyKeyboard
                             );
                         }
