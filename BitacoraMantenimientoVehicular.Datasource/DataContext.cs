@@ -17,79 +17,78 @@ namespace BitacoraMantenimientoVehicular.Datasource
             base.OnModelCreating(builder);
 
             builder.Entity<ClientEntity>(entity =>
-                {
-                    entity.HasIndex(t => new {t.Dni, t.Name}).IsUnique();
-                    entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
-                    entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
-                   
-                });
-             
-            builder.Entity<ColorEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<ColorEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => new {t.Dni, t.Name}).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
+               
+            });
 
-            builder.Entity<CountryEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<CountryEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
+            builder.Entity<ColorEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t =>  t.Name ).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
 
-            builder.Entity<FuelEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<FuelEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
+            });
 
+            builder.Entity<CountryEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => t.Name).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
 
-            builder.Entity<VehicleEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<VehicleEntity>()
-                .Property(b => b.CreatedDate)
-                .HasColumnType("datetime");
-            builder.Entity<VehicleEntity>()
-                .Property(b => b.ModifiedDate)
-                .HasColumnType("datetime");
+            });
 
+            builder.Entity<FuelEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => t.Name).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
 
-            builder.Entity<VehicleBrandEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<VehicleBrandEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
+            });
 
-            builder.Entity<VehicleStatusEntity>()
-                .HasIndex(t => t.Name)
-                .IsUnique();
-            builder.Entity<VehicleStatusEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
+            builder.Entity<VehicleEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => t.Name).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
+
+            });
+
+            builder.Entity<VehicleBrandEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => t.Name).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
+
+            });
+
+            builder.Entity<VehicleStatusEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(t => t.Name).IsUnique();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+                entity.Property(b => b.ModifiedDate).HasColumnType("datetimeoffset");
+
+            });
+
+            builder.Entity<RecordNotificationEntity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.Property(b => b.CreatedDate).HasDefaultValueSql("getutcdate()").HasColumnType("datetimeoffset").IsRequired();
+
+            });
 
             builder.Entity<UserEntity>()
                 .Property(e => e.Id)
                 .ValueGeneratedOnAdd();
-
-
-            builder.Entity<RecordNotificationEntity>()
-                .Property(e => e.Id)
-                .ValueGeneratedOnAdd();
-
-            builder.Entity<RecordNotificationEntity>()
-                .Property(b => b.CreatedDate)
-                .HasDefaultValueSql("getutcdate()")
-                .HasColumnType("datetime");
-          
         }
 
         public DbSet<ClientEntity> Client { get; set; }
