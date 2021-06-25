@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BitacoraMantenimientoVehicular.Bot.Helpers;
+using BitacoraMantenimientoVehicular.Bot.Report;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Enums;
 using DevExpress.Office.Utils;
+using DevExpress.XtraReports.Parameters;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +42,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                 try
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    _logger.LogInformation("Consulta a Base para Envio Telegram");
+                    _logger.LogInformation("Consulta a Base para Envio Telegram EnvioRegistroKmActual");
                     Console.ResetColor();
                     await using var context = _context.CreateDbContext();
 
@@ -53,8 +56,10 @@ namespace BitacoraMantenimientoVehicular.Bot
 
                         if (notificar.VehicleRecordActivity != null)
                         {
+
                             if (!notificar.Telegram)
                             {
+                                
                                 await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
                                 if (notificar.VehicleRecordActivity.Latitud != null && notificar.VehicleRecordActivity.Longitud != null)
                                     await Program.Bot.SendVenueAsync(
@@ -82,7 +87,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                     var proxEnvio = 1;
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
 
-                    Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxEnvio} min");
+                    Console.WriteLine($"{DateTime.Now:s} - Termino EnvioRegistroKmActual de Telegram, prox envio en {proxEnvio} min");
                     Console.ResetColor();
                     Console.WriteLine(Environment.NewLine);
                     await Task.Delay(TimeSpan.FromMinutes(proxEnvio), cancellationToken.Token);
@@ -125,72 +130,25 @@ namespace BitacoraMantenimientoVehicular.Bot
                             _logger.LogCritical($"Vehiculo {vehiculo.Name} no tiene ningun usuario asignado!!!");
                             return;
                         }
-                        var componentesNotificar = componenteCambio.Where(c => c.Vehicle.Id.Equals(vehiculo.Id)).ToList();
-
                         var dueno = usuarios.SingleOrDefault(d => d.UserType == UserType.Owner);
-
                         if (dueno == null)
                         {
                             _logger.LogCritical($"Vehiculo {vehiculo.Name} no tiene dueño!!!");
                             return;
                         }
-                       
-                        using var srv = new RichEditDocumentServer();
-                        var doc = srv.Document;
 
-                        var cp = doc.BeginUpdateCharacters(doc.Paragraphs[0].Range);
-                        cp.ForeColor = System.Drawing.Color.FromArgb(0x83, 0x92, 0x96);
-                        cp.Italic = true;
-                        doc.EndUpdateCharacters(cp);
-                        var pp = doc.BeginUpdateParagraphs(doc.Paragraphs[0].Range);
-                        pp.Alignment = ParagraphAlignment.Right;
-                        doc.EndUpdateParagraphs(pp);
-
-                        var tbl = doc.Tables.Create(doc.Range.Start, 1, 5, AutoFitBehaviorType.AutoFitToWindow);
-                      
-                        // Create a table header.
-                        doc.InsertText(tbl[0, 0].Range.Start, "Nro");
-                        doc.InsertText(tbl[0, 1].Range.Start, "Nombre");
-                        doc.InsertText(tbl[0, 2].Range.Start, "Cambio cada KM");
-                        doc.InsertText(tbl[0, 3].Range.Start, "Revisado");
-                        doc.InsertText(tbl[0, 4].Range.Start, "Observacion");
-                        //Set the width of the first column
-                        var table = doc.Tables[0];
-                        table.BeginUpdate();
-                        table.Rows[0].FirstCell.PreferredWidthType = WidthType.Fixed;
-                        table.Rows[0].FirstCell.PreferredWidth = Units.InchesToDocumentsF(0.8f);
-                        table.EndUpdate();
-                        var i = 1;
-                        foreach (var listado in componentesNotificar)
-                        {
-                            listadoComponentesMail.Append($"Componente a Cambiar: <b>{listado.Component.Name}</b><br>");
-                            listadoComponentesTelegram.Append($"Componente a Cambiar: <b>{listado.Component.Name}</b>\n");
-                            var row = tbl.Rows.Append();
-                            var cell = row.FirstCell;
-                            doc.InsertSingleLineText(cell.Range.Start, i.ToString());
-                            doc.InsertSingleLineText(cell.Next.Range.Start, listado.Component.Name);
-                            doc.InsertSingleLineText(cell.Next.Next.Range.Start, listado.Component.Ttl.ToString());
-                            doc.InsertSingleLineText(cell.Next.Next.Next.Range.Start, string.Empty);
-                            doc.InsertSingleLineText(cell.Next.Next.Next.Next.Range.Start, string.Empty);
-                            i++;
-                        }
-
-                        doc.AppendText($"Dueño: {dueno.Name} Ceular: {dueno.CellPhone} {Environment.NewLine}");
-                        doc.AppendText($"Plan de Mantenimiento Vehiculo: {vehiculo.Name} Km Actual: {vehiculo.KmActual}");
-                        // Insert an image using its URI.
-
-                        var docHeader = doc.Sections[0].BeginUpdateHeader();
-                        docHeader.Images.Append(DocumentImageSource.FromFile("LogoFinal.png"));
-                        doc.Sections[0].EndUpdateHeader(docHeader);
-                        foreach (var p in doc.Paragraphs.Get(tbl.FirstRow.Range)) p.Alignment = ParagraphAlignment.Center;
+                        //Creacion reporte
+                        var reprotComponent = new ReportComponent();
+                        reprotComponent.Parameters["pCodigoVehiculo"].Value = vehiculo.Id;
                         var fileName = $"{Guid.NewGuid()}-{vehiculo.Name}.pdf";
-                        srv.ExportToPdf(fileName);
-
+                        await reprotComponent.CreateDocumentAsync(cancellationToken.Token);
+                        await reprotComponent.ExportToPdfAsync(fileName, token: cancellationToken.Token);
+                        
+                     
                         var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        Thread.Sleep(TimeSpan.FromSeconds(15));
+                        Thread.Sleep(TimeSpan.FromSeconds(5));
                         foreach (var usuario in usuarios)
                         {
-
                             await Program.Bot.SendChatActionAsync(usuario.Telegram, ChatAction.Typing, cancellationToken.Token); 
                             await Program.Bot?.SendDocumentAsync(
                                                 chatId:  usuario.Telegram,

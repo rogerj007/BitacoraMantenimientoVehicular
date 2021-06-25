@@ -306,23 +306,30 @@ namespace BitacoraMantenimientoVehicular.Bot
                             }
                             if (km > 600)
                             {
-                                    InlineKeyboardMarkup rmu = new(new[]
-                                    {
-                                        // first row
-                                        new []
-                                        {
-                                            InlineKeyboardButton.WithCallbackData("\U0001F525 Si, es correcto!", $"Correcto|{placa}|{km}"),
-                                            InlineKeyboardButton.WithCallbackData("\U0001F61E No, el valor es equivocado!", $"Equivocado"),
-                                        },
-                                    });
-                                    
-                                    var mensaje = $"\U0001F44B Hola {message.From.FirstName} , bienvenido a nuestro sistema, el valor registrado {km} es correcto?";
 
-                                    await Bot.SendTextMessageAsync(
-                                    chatId: message.Chat.Id,
-                                    text: mensaje,
-                                    replyMarkup: rmu
-                                    );
+                                //var replyKB = new ReplyKeyboardMarkup
+                                //{
+                                //    Keyboard = new[] {new KeyboardButton[] {"A", "B",}},
+                                //    OneTimeKeyboard = true,
+                                //    ResizeKeyboard = true,
+                                //    Selective = false
+                                //};
+
+                                InlineKeyboardMarkup rmu = new(new[]
+                                {
+                                    new []
+                                    {
+                                    InlineKeyboardButton.WithCallbackData("\U0001F592 Si, es correcto!", $"Correcto|{placa}|{km}"),
+                                    InlineKeyboardButton.WithCallbackData("\U0001F61E No, el valor es equivocado!", $"Equivocado"),
+                                    }
+                                });
+
+                                var mensaje = $"\U0001F597 Hola {message.From.FirstName} , bienvenido a nuestro sistema, el valor registrado {km} es correcto?";
+                                await Bot.SendTextMessageAsync(
+                                chatId: message.Chat.Id,
+                                text: mensaje,
+                                replyMarkup: rmu
+                                );
                                    // Bot.SendTextMessageAsync(e.Message.Chat.Id, message, Telegram.Bot.Types.Enums.ParseMode.Default, false, false, 0, rmu, System.Threading.CancellationToken.None);
 
                             }
@@ -424,46 +431,83 @@ namespace BitacoraMantenimientoVehicular.Bot
             var placa = Convert.ToString(mensajeCallBack[1]);
             var km = Convert.ToInt64(mensajeCallBack[2]);
 
+            //callbackQuery.Message.Chat.Id
+            //Remueve el boton de eleccion
+            await Bot.EditMessageReplyMarkupAsync(
+                chatId: callbackQuery.Message.Chat.Id,
+                messageId: callbackQuery.Message.MessageId,
+                InlineKeyboardMarkup.Empty()
+            );
             switch (mensajeCallBack[0])
             {
                 case "Correcto":
-                   
                     if (consulta != null)
                     {
-                      
-                        var mensaje = await consulta.RegistroActividadAsync(placa, km, callbackQuery.Message.Chat.Id);
-                        if (!mensaje.Item1)
+
+                        await Bot.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Correcto",
+                            replyMarkup: new ReplyKeyboardRemove());
+                        var validarMantenimiento = await consulta.MantenimientoPorEjecutarAsync(placa);
+                        if (validarMantenimiento)
                         {
+                            InlineKeyboardMarkup rmu2 = new(new[]
+                            {
+                                // first row
+                                new []
+                                {
+                                    InlineKeyboardButton.WithCallbackData("\U0001F525 Si, es correcto!", $"MantenimientoEjecutado|{placa}|0"),
+                                    InlineKeyboardButton.WithCallbackData("\U0001F61E No lo he realizado, !", $"MantenimientoNoRealizado|{placa}|0"),
+                                },
+                            });
+
+                            var mensaje = $"\U0001F3CE, Existe un Mantenimiento pendiente, ya se lo realizo?";
+
                             await Bot.SendTextMessageAsync(
                                 chatId: callbackQuery.Message.Chat.Id,
-                                text: mensaje.Item2,
-                                replyMarkup: new ReplyKeyboardRemove()
+                                text: mensaje,
+                                replyMarkup: rmu2
                             );
                         }
                         else
                         {
-                            var requestReplyKeyboard =
-                                new ReplyKeyboardMarkup(
-                                    new[]
-                                    {
-                                        KeyboardButton.WithRequestLocation(
-                                            @$"Enviar Ubicacion para registro")
-                                    }, true)
-                                { ResizeKeyboard = true };
+                            var mensaje = await consulta.RegistroActividadAsync(placa, km, callbackQuery.Message.Chat.Id);
+                            if (!mensaje.Item1)
+                            {
+                                await Bot.SendTextMessageAsync(
+                                    chatId: callbackQuery.Message.Chat.Id,
+                                    text: mensaje.Item2,
+                                    replyMarkup: new ReplyKeyboardRemove()
+                                );
+                            }
+                            else
+                            {
+                                var requestReplyKeyboard =
+                                    new ReplyKeyboardMarkup(
+                                            new[]
+                                            {
+                                                KeyboardButton.WithRequestLocation(
+                                                    @$"Enviar Ubicacion para registro")
+                                            }, true)
+                                        { ResizeKeyboard = true, OneTimeKeyboard = true };
 
-                            await Bot.SendTextMessageAsync(
-                                chatId: callbackQuery.Message.Chat.Id,
-                                text: mensaje.Item2,
-                                replyMarkup: requestReplyKeyboard
-                            );
+                                await Bot.SendTextMessageAsync(
+                                    chatId: callbackQuery.Message.Chat.Id,
+                                    text: mensaje.Item2,
+                                    replyMarkup: requestReplyKeyboard
+                                );
+                            }
                         }
-
                     }
                     break;
                 case "Equivocado":
                     await Bot.SendTextMessageAsync(
                         callbackQuery.Message.Chat.Id,
                         $"Ok, vuelve a realizar el registro"
+                    );
+                    break;
+                case "MantenimientoNoRealizado":
+                    await Bot.SendTextMessageAsync(
+                        callbackQuery.Message.Chat.Id,
+                        $"Ok, El registro NO se puede realizar hasta que se haga el mantenimiento"
                     );
                     break;
                 case "MantenimientoEjecutado":
@@ -474,7 +518,32 @@ namespace BitacoraMantenimientoVehicular.Bot
                             chatId: callbackQuery.Message.Chat.Id,
                             text: mensaje,
                             replyMarkup: new ReplyKeyboardRemove());
+                        var mensajeRegistroActividad = await consulta.RegistroActividadAsync(placa, km, callbackQuery.Message.Chat.Id);
+                        if (!mensajeRegistroActividad.Item1)
+                        {
+                            await Bot.SendTextMessageAsync(
+                                chatId: callbackQuery.Message.Chat.Id,
+                                text: mensajeRegistroActividad.Item2,
+                                replyMarkup: new ReplyKeyboardRemove()
+                            );
+                        }
+                        else
+                        {
+                            var requestReplyKeyboard =
+                                new ReplyKeyboardMarkup(
+                                        new[]
+                                        {
+                                            KeyboardButton.WithRequestLocation(
+                                                @$"Enviar Ubicacion para registro")
+                                        }, true)
+                                    { ResizeKeyboard = true, OneTimeKeyboard = true };
 
+                            await Bot.SendTextMessageAsync(
+                                chatId: callbackQuery.Message.Chat.Id,
+                                text: mensajeRegistroActividad.Item2,
+                                replyMarkup: requestReplyKeyboard
+                            );
+                        }
                     }
                     break;
                 case "MantenimientoNoEjecutado":

@@ -36,7 +36,9 @@ namespace BitacoraMantenimientoVehicular.Bot
                     return (false,"Su usuario en Telegram No existe");
              
                 if (vehiculo == null)
-                    return (false, $"La placa del vehiculo {pPlaque} no existe");
+                    return (false, $"La placa del vehiculo {pPlaque} no existe..");
+                if (!vehiculo.IsEnable)
+                    return (false, $"El vehiculo {pPlaque} No esta activo...");
                 if (!usuario.IsEnable)
                     return (false, "Su usuario esta deshabilitado, comuniquese con el admin");
 
@@ -61,11 +63,9 @@ namespace BitacoraMantenimientoVehicular.Bot
                 context.Add(actividad);
                 await context.SaveChangesAsync();
                 var existeMantenimiento=await ValidarMantenimiento(vehiculo, usuario, kmTemp, pKm);
-                var mensaje=new StringBuilder($"Estimado el registro de la placa {pPlaque.ToUpper()} fue asignado correctamente registrado\n");
-                if (!string.IsNullOrEmpty(existeMantenimiento))
-                    mensaje.Append(existeMantenimiento);
-
-                return (true, existeMantenimiento);
+                var mensaje=new StringBuilder($"Estimado el registro de KM para placa {pPlaque.ToUpper()} fue existoso\n");
+                mensaje.Append(!string.IsNullOrEmpty(existeMantenimiento) ? existeMantenimiento : "Enviar su Ubicacion");
+                return (true, mensaje.ToString());
             }
             catch (InvalidOperationException exception)
             {
@@ -79,34 +79,57 @@ namespace BitacoraMantenimientoVehicular.Bot
             }
 
         }
-
+        public async Task<bool> MantenimientoPorEjecutarAsync(string pPlaque)
+        {
+            try
+            {
+                await using var context = _context.CreateDbContext();
+                var vehicle = await context.Vehicle.SingleOrDefaultAsync(v => v.Name.Equals(pPlaque));
+                if (vehicle == null)
+                    return false;
+                var existeRegistro = await context.ComponentNextChange.Include(v => v.Vehicle).Where(v => v.Vehicle.Id.Equals(vehicle.Id) && !v.IsComplete).ToListAsync();
+                return existeRegistro.Any();
+            }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return false;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
+                return false;
+            }
+        }
         public async Task<string> MantenimientoEjecutadoAsync(string pPlaque)
         {
             try
             {
                 await using var context = _context.CreateDbContext();
-              //  var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
+                //  var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
                 var vehicle = await context.Vehicle.SingleOrDefaultAsync(v => v.Name.Equals(pPlaque));
                 if (vehicle == null)
                 {
-                    return "No existe vehiculo en el ";
+                    return string.Empty;
                 }
-                var existeRegistro = await context.ComponentNextChange.Include(v => v.Vehicle).Where(v => v.Vehicle.Id.Equals(vehicle.Id)).ToListAsync();
+                var existeRegistro = await context.ComponentNextChange.Include(v => v.Vehicle).Where(v => v.Vehicle.Id.Equals(vehicle.Id) && !v.IsComplete).ToListAsync();
                                      //&& (r.Latitud == null || r.Longitud == null));
                 string mensaje;
                 if (existeRegistro == null)
-                    mensaje = $"No existe vehiculo para realizar mantenimiento";
+                    mensaje = string.Empty; 
                 else
                 {
-
+                    var listaComponetes = await context.Component.ToListAsync();
                     foreach (var registro in existeRegistro)
                     {
-                        var db = await context.ComponentNextChange.SingleAsync(c=>c.Id.Equals(registro.Id));
+                        var db = await context.ComponentNextChange.Include(c=>c.Component).SingleAsync(c=>c.Id.Equals(registro.Id));
+                        var componente = listaComponetes.Single(c => c.Id.Equals(db.Component.Id));
+                        db.Km = componente.Ttl;
                         db.IsComplete = true;
                         db.ModifiedDate = DateTime.UtcNow;
                         await context.SaveChangesAsync();
                     }
-                    mensaje = $"Estimado el mantenimiento fue correctamente registrado al vehiculo {pPlaque}\n";
+                    mensaje = $"El mantenimiento fue correctamente registrado al vehiculo {pPlaque}\n";
                 }
 
 
@@ -175,7 +198,6 @@ namespace BitacoraMantenimientoVehicular.Bot
                 var clients = await context.ClientEntityVehicle
                                 .Where(u => u.VehicleEntity.Id == record.Vehicle.Id)
                                 .Select(x=>x.ClientEntity).AsNoTracking().ToListAsync();;
-
                 foreach (var client in clients)
                 {
 
@@ -184,8 +206,9 @@ namespace BitacoraMantenimientoVehicular.Bot
                                             {    Client = clientdb,
                                                 VehicleRecordActivity = record, 
                                                 Vehicle = record.Vehicle,
-                                                CreatedDate = DateTime.UtcNow
-                                            };
+                                                CreatedDate = DateTime.UtcNow,
+                                                Telegram = record.RegisterBy.Id==client.Id
+                    };
                     var entry = context.Entry(registroNotificacion);
                     entry.State = EntityState.Added;
                     //context.Attach(registroNotificacion);
@@ -201,46 +224,6 @@ namespace BitacoraMantenimientoVehicular.Bot
             catch (Exception exception)
             {
                 _logger.LogError(exception.ToMessageAndCompleteStacktrace());
-            }
-
-        }
-
-
-        public async Task<string> RegistroCambioComponenteRealizadoAsync(Message message)
-        {
-            try
-            {
-                await using var context = _context.CreateDbContext();
-                var usuario = await context.Client.SingleOrDefaultAsync(u => u.Telegram == message.From.Id.ToString());
-                var existeRegistro = await context.VehicleRecordActivity.Include(v => v.Vehicle).SingleOrDefaultAsync(r => r.RegisterBy.Id.Equals(usuario.Id) && (r.Latitud == null || r.Longitud == null));
-                string mensaje;
-                if (existeRegistro == null)
-                    mensaje =
-                        $"No existe bitacora para actualizar, ejecute el registro de Km recorridos {message.From.FirstName} {message.From.LastName}";
-                else
-                {
-                    existeRegistro.Latitud = (decimal?)message.Location.Latitude;
-                    existeRegistro.Longitud = (decimal?)message.Location.Longitude;
-                    await context.SaveChangesAsync();
-                    await NotificarClientesAsync(existeRegistro);
-
-                    mensaje = $"Estimado el registro de la placa {existeRegistro.Vehicle.Name.ToUpper()} fue asignado correctamente registrado\n";
-                }
-
-
-                return mensaje;
-            }
-            catch (InvalidOperationException exception)
-            {
-                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
-                return "Error en registro de ubicacion";
-
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception.ToMessageAndCompleteStacktrace());
-                return "Error en registro de ubicacion";
-
             }
 
         }
@@ -269,7 +252,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             var ttl = validarTiempoVidaComponente.Km - kmRecorrido;
                             validarTiempoVidaComponente.Km = ttl>0?ttl:0;
                             validarTiempoVidaComponente.ModifiedDate = DateTimeOffset.UtcNow;
-                            if (validarTiempoVidaComponente.Km <= 250)
+                            if (validarTiempoVidaComponente.Km <= 500)
                             {
                                 mensaje.Append($"Componente : {componente.Name} debe ser remplazado cada {componente.Ttl} y tiene menos de {validarTiempoVidaComponente.Km} Km\n");
                                 validarTiempoVidaComponente.IsComplete = false;

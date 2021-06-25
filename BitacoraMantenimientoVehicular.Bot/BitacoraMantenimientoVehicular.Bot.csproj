@@ -7,13 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Report\ReportComponent.vsrepx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Report\ReportComponent.vsrepx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="DevExpress.Data" Version="21.1.3" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="21.1.3" />
     <PackageReference Include="DevExpress.RichEdit.Core" Version="21.1.3" />
     <PackageReference Include="DevExpress.RichEdit.Export" Version="21.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
@@ -23,12 +32,21 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
+    <PackageReference Include="Telegram.Bot" Version="16.0.0" />
     <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BitacoraMantenimientoVehicular.Datasource\BitacoraMantenimientoVehicular.Datasource.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Report\ReportComponent.cs">
+      <DependentUpon>ReportComponent.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="Report\ReportComponent.Designer.cs">
+      <DependentUpon>ReportComponent.vsrepx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
