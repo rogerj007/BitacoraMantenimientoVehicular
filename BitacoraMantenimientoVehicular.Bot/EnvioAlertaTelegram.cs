@@ -17,6 +17,7 @@ using DevExpress.XtraRichEdit.API.Native;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 
@@ -80,6 +81,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                                 mensaje.Append($"<b>Vehiculo:</b> {notificar.Vehicle.Name} registro el Km actual : <b>{notificar.VehicleRecordActivity.Km}<br>");
                                 mensaje.Append($"<b>Latitud:</b> { notificar.VehicleRecordActivity.Latitud} <b>Longitud:</b> {notificar.VehicleRecordActivity.Longitud}<br>");
                                 consulta.Mail = mensaje.ToString().SendMail(notificar.Client.Mail, "Registro de Km Actual");
+
                             }
                         }
                         await context.SaveChangesAsync(cancellationToken.Token);
@@ -104,12 +106,12 @@ namespace BitacoraMantenimientoVehicular.Bot
 
 
         }
-
         public async Task EnvioComponenteCambiar()
         {
             var cancellationToken = new CancellationTokenSource();
             while (!cancellationToken.IsCancellationRequested)
             {
+                var proxNotificacion = Convert.ToInt16(_config.GetSection("ProximaNotificacion").Value);
                 try
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -143,33 +145,47 @@ namespace BitacoraMantenimientoVehicular.Bot
                         var fileName = $"{Guid.NewGuid()}-{vehiculo.Name}.pdf";
                         await reprotComponent.CreateDocumentAsync(cancellationToken.Token);
                         await reprotComponent.ExportToPdfAsync(fileName, token: cancellationToken.Token);
-                        
-                     
                         var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                         Thread.Sleep(TimeSpan.FromSeconds(5));
                         foreach (var usuario in usuarios)
                         {
-                            await Program.Bot.SendChatActionAsync(usuario.Telegram, ChatAction.Typing, cancellationToken.Token); 
-                            await Program.Bot?.SendDocumentAsync(
-                                                chatId:  usuario.Telegram,
-                                                document: new InputOnlineFile(fileStream, $"{vehiculo.Name}.pdf"),
-                                                caption:"Listado Componentes a Cambiar",
-                                                parseMode: ParseMode.Html,
-                                                disableNotification: true,
-                                                cancellationToken: cancellationToken.Token);
+                            try
+                            {
+                                _logger.LogInformation($"Envio  {usuario.Name} {usuario.Mail} - {usuario.Telegram}");
+                                listadoComponentesMail.ToString().SendMail(usuario.Mail, "Listado de Componentes a Cambiar", fileName);
+                                await Program.Bot.SendChatActionAsync(usuario.Telegram, ChatAction.Typing,
+                                    cancellationToken.Token);
+                                await Program.Bot?.SendDocumentAsync(
+                                    chatId: usuario.Telegram,
+                                    document: new InputOnlineFile(fileStream, $"{vehiculo.Name}.pdf"),
+                                    caption: "Listado Componentes a Cambiar",
+                                    parseMode: ParseMode.Html,
+                                    disableNotification: true,
+                                    cancellationToken: cancellationToken.Token);
 
-                            Thread.Sleep(TimeSpan.FromSeconds(15));
-                            listadoComponentesMail.ToString().SendMail(usuario.Mail, "Listado de Componentes a Cambiar", fileName);
+                                Thread.Sleep(TimeSpan.FromSeconds(15));
+                            }
+                            catch (ApiRequestException e)
+                            {
+                                Console.WriteLine($"Error on Notificar {usuario.Name} {usuario.Mail} {Environment.NewLine}Error: " + e.ToMessageAndCompleteStacktrace());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Error on Notificar {usuario.Name} {usuario.Mail} {Environment.NewLine}Error: "+e.ToMessageAndCompleteStacktrace());
+                            }
                         }
-                        await context.SaveChangesAsync(cancellationToken.Token);
-                    }
-                    var proxEnvio = 1;
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
 
-                    Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxEnvio} min");
+                        var filePdf = new FileInfo(fileName);
+                        if(filePdf.Exists)filePdf.Delete();
+                        // await context.SaveChangesAsync(cancellationToken.Token);
+                    }
+
+                  
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine($"{DateTime.Now:s} - Termino envio de Telegram, prox envio en {proxNotificacion} horas");
                     Console.ResetColor();
                     Console.WriteLine(Environment.NewLine);
-                    await Task.Delay(TimeSpan.FromMinutes(proxEnvio), cancellationToken.Token);
+                    await Task.Delay(TimeSpan.FromHours(proxNotificacion), cancellationToken.Token);
                 }
                 catch (Exception ex)
                 {
