@@ -205,8 +205,11 @@ namespace BitacoraMantenimientoVehicular.Web.Controllers
                     return RedirectToPage("/Index");
                     //return RedirectToAction("Index", "Home");
                 }
-                if(result.IsNotAllowed)
-                    return Unauthorized();
+
+                return BadRequest("Usuario no existe");
+
+                //if(result.IsNotAllowed)
+                //    return Unauthorized();
                 //if (result.IsLockedOut)
                 //{
                 //   // _logger.LogWarning(2, "User account locked out.");
