@@ -1,20 +1,20 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 21.2.3
-* Build date: Thu Oct 28 2021
+* Version: 23.1.4
+* Build date: Fri Jul 14 2023
 *
-* Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2023 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 ! function(factory) {
     if ("function" === typeof define && define.amd) {
         define((function(require, exports, module) {
-            module.exports = factory(require("jquery"), require("./core/templates/template_engine_registry").setTemplateEngine, require("./core/templates/template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"), require("./core/utils/dom").extractTemplateMarkup, require("./core/utils/string").encodeHtml, require("./core/utils/ajax"), require("./core/utils/console"))
+            module.exports = factory(require("jquery"), require("./core/templates/template_engine_registry").setTemplateEngine, require("./core/templates/template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"), require("./core/utils/dom").extractTemplateMarkup, require("./core/utils/string").encodeHtml, require("./core/utils/ajax"))
         }))
     } else {
-        DevExpress.aspnet = factory(window.jQuery, DevExpress.setTemplateEngine, DevExpress.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator, DevExpress.utils.dom.extractTemplateMarkup, DevExpress.utils.string.encodeHtml, DevExpress.utils.ajax, DevExpress.utils.console)
+        DevExpress.aspnet = factory(window.jQuery, DevExpress.setTemplateEngine, DevExpress.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator, DevExpress.utils.dom.extractTemplateMarkup, DevExpress.utils.string.encodeHtml, DevExpress.utils.ajax)
     }
-}((function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml, ajax, console) {
+}((function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml, ajax) {
     var templateCompiler = function() {
         var EXTENDED_OPEN_TAG = /[<[]%/g,
             EXTENDED_CLOSE_TAG = /%[>\]]/g;
@@ -33,9 +33,9 @@
                 bag.push("_.push(");
                 var expression = value;
                 if (encode) {
-                    expression = "arguments[1]((" + value + " !== null && " + value + " !== undefined) ? " + value + ' : "")';
+                    expression = "encodeHtml((" + value + " !== null && " + value + " !== undefined) ? " + value + ' : "")';
                     if (/^\s*$/.test(value)) {
-                        expression = "arguments[1](" + value + ")"
+                        expression = "encodeHtml(" + value + ")"
                     }
                 }
                 bag.push(expression);
@@ -44,18 +44,13 @@
                 bag.push(code + "\n")
             }
         }
-        return function(text) {
+        return function(element) {
+            var text = extractTemplateMarkup(element);
             var bag = ["var _ = [];", "with(obj||{}) {"],
-                chunks = text.split(enableAlternativeTemplateTags ? EXTENDED_OPEN_TAG : "<%");
-            if (warnBug17028 && chunks.length > 1) {
-                if (text.indexOf("<%") > -1) {
-                    console.logger.warn("Please use an alternative template syntax: https://community.devexpress.com/blogs/aspnet/archive/2020/01/29/asp-net-core-new-syntax-to-fix-razor-issue.aspx");
-                    warnBug17028 = false
-                }
-            }
+                chunks = text.split(EXTENDED_OPEN_TAG);
             acceptText(bag, chunks.shift());
             for (var i = 0; i < chunks.length; i++) {
-                var tmp = chunks[i].split(enableAlternativeTemplateTags ? EXTENDED_CLOSE_TAG : "%>");
+                var tmp = chunks[i].split(EXTENDED_CLOSE_TAG);
                 if (2 !== tmp.length) {
                     throw "Template syntax error"
                 }
@@ -63,12 +58,23 @@
                 acceptText(bag, tmp[1])
             }
             bag.push("}", "return _.join('')");
-            return new Function("obj", bag.join(""))
+            var code = bag.join("");
+            try {
+                return new Function("obj", "encodeHtml", code)
+            } catch (e) {
+                var src = element[0];
+                if ("SCRIPT" === src.tagName) {
+                    var funcName = src.id.replaceAll("-", "");
+                    var func = "function " + funcName + "(obj,encodeHtml){\n" + code + "\n}";
+                    $.globalEval(func, src, window.document);
+                    return funcName
+                } else {
+                    return text
+                }
+            }
         }
     }();
     var pendingCreateComponentRoutines = [];
-    var enableAlternativeTemplateTags = true;
-    var warnBug17028 = false;
 
     function createComponent(name, options, id, validatorOptions) {
         var selector = "#" + String(id).replace(/[^\w-]/g, "\\$&");
@@ -116,24 +122,26 @@
             if (setTemplateEngine) {
                 setTemplateEngine({
                     compile: function(element) {
-                        return templateCompiler(extractTemplateMarkup(element))
+                        return templateCompiler(element)
                     },
                     render: function(template, data) {
-                        var html = template(data, encodeHtml);
-                        var dxMvcExtensionsObj = window.MVCx;
-                        if (dxMvcExtensionsObj && !dxMvcExtensionsObj.isDXScriptInitializedOnLoad) {
-                            html = html.replace(/(<script[^>]+)id="dxss_.+?"/g, "$1")
+                        if (template instanceof Function) {
+                            var html = template(data, encodeHtml);
+                            var dxMvcExtensionsObj = window.MVCx;
+                            if (dxMvcExtensionsObj && !dxMvcExtensionsObj.isDXScriptInitializedOnLoad) {
+                                html = html.replace(/(<script[^>]+)id="dxss_.+?"/g, "$1")
+                            }
+                            return html
+                        } else if (window[template] instanceof Function) {
+                            return window[template](data, encodeHtml)
+                        } else if ("string" === typeof template) {
+                            return template
+                        } else {
+                            throw "Unknown template type"
                         }
-                        return html
                     }
                 })
             }
-        },
-        enableAlternativeTemplateTags: function(value) {
-            enableAlternativeTemplateTags = value
-        },
-        warnBug17028: function() {
-            warnBug17028 = true
         },
         createValidationSummaryItems: function(validationGroup, editorNames) {
             var groupConfig, items, summary = function(validationGroup) {

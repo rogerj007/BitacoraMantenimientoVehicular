@@ -61,7 +61,7 @@ namespace BitacoraMantenimientoVehicular.Web
 
             services.AddDbContext<DataContext>(cfg =>
             {
-                cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionV2"));
+                cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionV1"));
             });
 
             services.AddAutoMapper(typeof(Startup));

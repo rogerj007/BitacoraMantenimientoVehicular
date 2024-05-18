@@ -19,7 +19,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.InputFiles;
+
 using Telegram.Bot.Types.ReplyMarkups;
 using ILogger = Serilog.ILogger;
 
@@ -166,13 +166,6 @@ namespace BitacoraMantenimientoVehicular.Bot
                 UpdateType.CallbackQuery => BotOnCallbackQueryReceived(update.CallbackQuery),
                 UpdateType.InlineQuery => BotOnInlineQueryReceived(update.InlineQuery),
                 UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(update.ChosenInlineResult),
-
-                // UpdateType.Unknown:
-                // UpdateType.ChannelPost:
-                // UpdateType.EditedChannelPost:
-                // UpdateType.ShippingQuery:
-                // UpdateType.PreCheckoutQuery:
-                // UpdateType.Poll:
                 _ => UnknownUpdateHandlerAsync(update)
             };
 

@@ -275,14 +275,26 @@ namespace BitacoraMantenimientoVehicular.Web.Data
             {
                 await _dataContext.Color.AddRangeAsync(
                     new ColorEntity { Name = "ROJO", CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "NEGRO", IsEnable=true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "AZUL", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "AMARILLO", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "NARANJA", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "BLANCO", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "MORADO", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "PLOMO", IsEnable = true, CreatedDate = DateTime.UtcNow },
-                                new ColorEntity { Name = "MARRON", IsEnable = true, CreatedDate = DateTime.UtcNow }
+                    new ColorEntity { Name = "NEGRO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "AZUL", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "AMARILLO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "NARANJA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "BLANCO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "MORADO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "PLOMO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "MARRON", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "VERDE", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "TURQUESA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "MAGENTA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "DORADO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "PLATEADO", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "ROSA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "SALMON", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "CORAL", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "OLIVA", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "LIME", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "CELESTE", IsEnable = true, CreatedDate = DateTime.UtcNow },
+                    new ColorEntity { Name = "BEIGE", IsEnable = true, CreatedDate = DateTime.UtcNow }
                     );
                 await _dataContext.SaveChangesAsync();
 

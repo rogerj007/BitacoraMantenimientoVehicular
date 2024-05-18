@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
+
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,16 +10,15 @@ using BitacoraMantenimientoVehicular.Bot.Helpers;
 using BitacoraMantenimientoVehicular.Bot.Report;
 using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Datasource.Enums;
-using DevExpress.Office.Utils;
-using DevExpress.XtraReports.Parameters;
-using DevExpress.XtraRichEdit;
-using DevExpress.XtraRichEdit.API.Native;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
+
 
 namespace BitacoraMantenimientoVehicular.Bot
 {
@@ -61,7 +60,7 @@ namespace BitacoraMantenimientoVehicular.Bot
                             if (!notificar.Telegram)
                             {
                                 
-                                await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
+                                //await Program.Bot.SendChatActionAsync(notificar.Client.Telegram, ChatAction.Typing, cancellationToken.Token);
                                 if (notificar.VehicleRecordActivity.Latitud != null && notificar.VehicleRecordActivity.Longitud != null)
                                     await Program.Bot.SendVenueAsync(
                                         notificar.Client.Telegram,
@@ -153,11 +152,14 @@ namespace BitacoraMantenimientoVehicular.Bot
                             {
                                 _logger.LogInformation($"Envio  {usuario.Name} {usuario.Mail} - {usuario.Telegram}");
                                 listadoComponentesMail.ToString().SendMail(usuario.Mail, "Listado de Componentes a Cambiar", fileName);
-                                await Program.Bot.SendChatActionAsync(usuario.Telegram, ChatAction.Typing,
-                                    cancellationToken.Token);
+                                await Program.Bot.SendChatActionAsync(usuario.Telegram, ChatAction.Typing );
+
+
+                                InputFile inputFile = InputFile.FromStream(fileStream, $"{vehiculo.Name}.pdf");
+                             
                                 await Program.Bot?.SendDocumentAsync(
                                     chatId: usuario.Telegram,
-                                    document: new InputOnlineFile(fileStream, $"{vehiculo.Name}.pdf"),
+                                    document: inputFile,
                                     caption: "Listado Componentes a Cambiar",
                                     parseMode: ParseMode.Html,
                                     disableNotification: true,

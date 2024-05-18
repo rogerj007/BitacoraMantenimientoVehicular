@@ -1,4 +1,4 @@
-// Version: 2.8.2
+// Version: 2.9.2
 // https://github.com/DevExpress/DevExtreme.AspNet.Data
 // Copyright (c) Developer Express Inc.
 
@@ -7,23 +7,27 @@
 (function(factory) {
     "use strict";
 
+    function unwrapESModule(module) {
+        return module && module.__esModule && module.default ? module.default : module;
+    }
+
     if(typeof define === "function" && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
-                require("devextreme/core/utils/ajax"),
+                unwrapESModule(require("devextreme/core/utils/ajax")),
                 require("jquery").Deferred,
                 require("jquery").extend,
-                require("devextreme/data/custom_store"),
-                require("devextreme/data/utils")
+                unwrapESModule(require("devextreme/data/custom_store")),
+                unwrapESModule(require("devextreme/data/utils"))
             );
         });
     } else if (typeof module === "object" && module.exports) {
         module.exports = factory(
-            require("devextreme/core/utils/ajax"),
+            unwrapESModule(require("devextreme/core/utils/ajax")),
             require("jquery").Deferred,
             require("jquery").extend,
-            require("devextreme/data/custom_store"),
-            require("devextreme/data/utils")
+            unwrapESModule(require("devextreme/data/custom_store")),
+            unwrapESModule(require("devextreme/data/utils"))
         );
     } else {
         DevExpress.data.AspNet = factory(
@@ -364,7 +368,8 @@
 
     function getErrorMessageFromXhr(xhr) {
         var mime = xhr.getResponseHeader("Content-Type"),
-            responseText = xhr.responseText;
+            responseText = xhr.responseText,
+            candidate;
 
         if(!mime)
             return null;
@@ -388,6 +393,23 @@
             return responseText;
         }
 
+        if(mime.indexOf("application/problem+json") === 0) {
+            var jsonObj = safeParseJSON(responseText);
+
+            var candidate;
+            if(typeof jsonObj === "object") {
+                candidate = jsonObj.title;
+                if(isNonEmptyString(candidate))
+                    return candidate;
+
+                candidate = jsonObj.detail;
+                if(isNonEmptyString(candidate))
+                    return candidate;
+            }
+
+            return responseText;
+        }
+
         return null;
     }
 
@@ -397,6 +419,10 @@
         } catch(x) {
             return null;
         }
+    }
+
+    function isNonEmptyString(value) {
+        return typeof value === "string" && value.length > 0;
     }
 
     return {
