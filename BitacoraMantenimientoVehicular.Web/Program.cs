@@ -1,4 +1,5 @@
 using System;
+using BitacoraMantenimientoVehicular.Datasource;
 using BitacoraMantenimientoVehicular.Web.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +25,9 @@ namespace BitacoraMantenimientoVehicular.Web
             var services = scope.ServiceProvider;
             try
             {
-                //var context = services.GetRequiredService<DataContext>();
-                //context.Database.EnsureCreated();
-                //   DbInitializer.Initialize(context);
+                var context = services.GetRequiredService<DataContext>();
+                context.Database.EnsureCreated();
+                //DbInitializer.Initialize(context);
                 var seeder = scope.ServiceProvider.GetService<SeedDb>();
                 seeder.SeedAsync().Wait();
             }

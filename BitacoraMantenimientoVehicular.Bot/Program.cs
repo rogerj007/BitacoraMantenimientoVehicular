@@ -473,14 +473,21 @@ namespace BitacoraMantenimientoVehicular.Bot
                             }
                             else
                             {
-                                var requestReplyKeyboard =
-                                    new ReplyKeyboardMarkup(
-                                            new[]
-                                            {
-                                                KeyboardButton.WithRequestLocation(
-                                                    @$"Enviar Ubicacion para registro")
-                                            }, true)
-                                        { ResizeKeyboard = true, OneTimeKeyboard = true };
+
+                                var requestReplyKeyboard = new ReplyKeyboardMarkup(keyboardRow: new[]
+                                                           {
+                                                                KeyboardButton.WithRequestLocation(text: "Enviar Ubicacion para registro")
+                                                             
+                                                            });
+
+                                //var requestReplyKeyboard =
+                                //    new ReplyKeyboardMarkup(
+                                //            new[]
+                                //            {
+                                //                KeyboardButton.WithRequestLocation(
+                                //                    @$"Enviar Ubicacion para registro")
+                                //            }, true)
+                                //        { ResizeKeyboard = true, OneTimeKeyboard = true };
 
                                 await Bot.SendTextMessageAsync(
                                     chatId: callbackQuery.Message.Chat.Id,
@@ -522,14 +529,19 @@ namespace BitacoraMantenimientoVehicular.Bot
                         }
                         else
                         {
-                            var requestReplyKeyboard =
-                                new ReplyKeyboardMarkup(
-                                        new[]
-                                        {
-                                            KeyboardButton.WithRequestLocation(
-                                                @$"Enviar Ubicacion para registro")
-                                        }, true)
-                                    { ResizeKeyboard = true, OneTimeKeyboard = true };
+                            var requestReplyKeyboard = new ReplyKeyboardMarkup(keyboardRow: new[]
+                                                          {
+                                                                KeyboardButton.WithRequestLocation(text: "Enviar Ubicacion para registro")
+
+                                                            });
+                            //var requestReplyKeyboard =
+                            //    new ReplyKeyboardMarkup(
+                            //            new[]
+                            //            {
+                            //                KeyboardButton.WithRequestLocation(
+                            //                    @$"Enviar Ubicacion para registro")
+                            //            }, true)
+                            //        { ResizeKeyboard = true, OneTimeKeyboard = true };
 
                             await Bot.SendTextMessageAsync(
                                 chatId: callbackQuery.Message.Chat.Id,
@@ -556,22 +568,41 @@ namespace BitacoraMantenimientoVehicular.Bot
         {
             _serilogLogger.Warning($"Received inline query from: {inlineQuery.From.Id}");
 
-            InlineQueryResultBase[] results = {
-                // displayed result
+
+            InlineQueryResult[] results = {
+
                 new InlineQueryResultArticle(
                     id: "1",
                     title: "Saludo",
                     inputMessageContent: new InputTextMessageContent(
                         "Hola mucho gusto, cualquier cosa me escriben..."
                     )
-                ), new InlineQueryResultArticle(
+                ),
+                new InlineQueryResultArticle(
                     id: "2",
-                    title: "Saludos",
+                    title: "Saludo",
                     inputMessageContent: new InputTextMessageContent(
                         "Que novedad..."
                     )
                 )
             };
+
+            //InlineQueryResultBase[] results = {
+            //    // displayed result
+            //    new InlineQueryResultArticle(
+            //        id: "1",
+            //        title: "Saludo",
+            //        inputMessageContent: new InputTextMessageContent(
+            //            ""
+            //        )
+            //    ), new InlineQueryResultArticle(
+            //        id: "2",
+            //        title: "Saludos",
+            //        inputMessageContent: new InputTextMessageContent(
+            //            "Que novedad..."
+            //        )
+            //    )
+            //};
 
             await Bot.AnswerInlineQueryAsync(
                 inlineQuery.Id,

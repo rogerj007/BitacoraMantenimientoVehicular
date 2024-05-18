@@ -63,7 +63,7 @@ namespace BitacoraMantenimientoVehicular.Web.Data
 
         private async Task CheckUsersAsync()
         {
-            await CheckUserAsync("1010", "Admin", "Web", "ajelonarvaez.m92@gmail.com", "00000000", "Calle Luna Calle Venus", true);
+            await CheckUserAsync("1010", "Admin", "Web", "mantenimientoflota@utn.edu.ec", "00000000", "Otavalo UTN", true);
         }
 
         private async Task<UserEntity> CheckUserAsync(
